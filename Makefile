@@ -1,7 +1,7 @@
 CXX      	 := g++
 CPPFLAGS   	 := -std=c++20 -arch x86_64
 LIBS 	 	 := -L./libs/lua -llua52 -L./libs/glfw/lib-x86_64 -lglfw3
-INCLUDE      := -I./libs/lua/include -I./libs/glfw/include
+INCLUDE      := -I./libs/lua/include -I./libs/glfw/include -I./include
 FRAMEWORKS   := -framework Cocoa -framework OpenGL -framework IOKit
 
 TARGET_NAME  := main.out

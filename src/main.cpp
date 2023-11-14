@@ -2,6 +2,10 @@
 #include <lua.hpp>
 #include <exception>
 #include <GLFW/glfw3.h>
+#include <Utils.hpp>
+#include <GameWindow.hpp>
+#include <Game.hpp>
+#include <components/ScriptComponent.hpp>
 
 #define ASSERT_LUA_TYPE_NUMBER(L, index) if (!lua_isnumber(L, index)) { lua_close(L); throw std::string("Type is not a number!"); }
 #define ASSERT_LUA_TYPE_TABLE(L, index)  if (!lua_istable (L, index)) { lua_close(L); throw std::string("Type is not a table!") ; }
@@ -122,35 +126,30 @@ static int Entity_Create(lua_State *L)
 
 int main(int argc, char const *argv[])
 {
-    glfwInit();
-    GLFWwindow* window = glfwCreateWindow(640, 480, "My Title", NULL, NULL);
+    Game::CreateGame();
 
-    while(!glfwWindowShouldClose(window))
-    {
-        glfwPollEvents();
-    }
+    ScriptComponent* script = new ScriptComponent("../scripts/script.lua");
 
-    lua_State* L = luaL_newstate();
-    luaL_openlibs(L);
+    // lua_State* L = luaL_newstate();
+    // luaL_openlibs(L);
 
-    RegisterEntity(L);
+    // RegisterEntity(L);
 
-    static const luaL_Reg Static[] = {
-		{ "Create",   Entity_Create },
-		{ NULL,		NULL },
-	};
-    luaL_setfuncs(L, Static, 0);
+    // static const luaL_Reg Static[] = {
+	// 	{ "Create",   Entity_Create },
+	// 	{ NULL,		NULL },
+	// };
+    // luaL_setfuncs(L, Static, 0);
+	// lua_setglobal(L, "Entity");
 
-    // lua_pushcfunction(L, Entity_Create);
-	// lua_setglobal(L, "NewEntity");
-	lua_setglobal(L, "Entity");
+    // lua_RegisterGameWindow(L);
 
-    if (LuaStateCheckIfOK(L, luaL_dofile(L, "script.lua")))
-    {
-        LuaStateStackDump(L);
-    }
+    // if (LuaStateCheckIfOK(L, luaL_dofile(L, "../scripts/script.lua")))
+    // {
 
-    lua_close(L);
+    // }
+
+    // lua_close(L);
 
     return EXIT_SUCCESS;
 }

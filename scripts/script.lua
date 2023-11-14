@@ -1,11 +1,7 @@
--- print("Running main script")
+-- GameWindow.CreateGameWindow(800, 600, "Title")
+-- GameWindow.Run()
 
--- local Context = require("Context")
+Game.LoadModule("GameWindow")
 
--- game = Context.new({ name = "Game 1", width = 800, height = 600 })
-
-
--- print(game.width)
-
-a = Entity.Create()
-a:Print()
+GameWindow.CreateGameWindow(800, 600, "Title")
+GameWindow.Run()
