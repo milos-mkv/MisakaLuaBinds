@@ -1,6 +1,7 @@
 #include <iostream>
 #include <lua.hpp>
 #include <exception>
+#include <GLFW/glfw3.h>
 
 #define ASSERT_LUA_TYPE_NUMBER(L, index) if (!lua_isnumber(L, index)) { lua_close(L); throw std::string("Type is not a number!"); }
 #define ASSERT_LUA_TYPE_TABLE(L, index)  if (!lua_istable (L, index)) { lua_close(L); throw std::string("Type is not a table!") ; }
@@ -121,6 +122,14 @@ static int Entity_Create(lua_State *L)
 
 int main(int argc, char const *argv[])
 {
+    glfwInit();
+    GLFWwindow* window = glfwCreateWindow(640, 480, "My Title", NULL, NULL);
+
+    while(!glfwWindowShouldClose(window))
+    {
+        glfwPollEvents();
+    }
+
     lua_State* L = luaL_newstate();
     luaL_openlibs(L);
 
