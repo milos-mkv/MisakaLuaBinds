@@ -24,7 +24,7 @@ ScriptComponent::ScriptComponent(const char* path)
 
     if (LuaStateCheckIfOK(m_state, luaL_dofile(m_state, m_path.c_str())))
     {
-
+        
     }
 }
 

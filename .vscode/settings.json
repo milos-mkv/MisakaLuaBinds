@@ -52,6 +52,14 @@
         "unordered_map": "cpp",
         "variant": "cpp",
         "vector": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "memory": "cpp",
+        "fstream": "cpp",
+        "__tree": "cpp",
+        "deque": "cpp",
+        "iomanip": "cpp",
+        "map": "cpp",
+        "regex": "cpp",
+        "unordered_set": "cpp"
     }
 }

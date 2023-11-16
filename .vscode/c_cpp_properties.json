@@ -5,7 +5,9 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/libs/glfw/include",
-                "${workspaceFolder}/libs/lua/include"
+                "${workspaceFolder}/libs/lua/include",
+                "${workspaceFolder}/libs/imgui/backends",
+                "${workspaceFolder}/libs/imgui"
             ],
             "defines": [],
             "macFrameworkPath": [

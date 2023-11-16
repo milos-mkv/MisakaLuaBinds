@@ -1,4 +1,9 @@
--- GameWindow.CreateGameWindow(800, 600, "Title")
--- GameWindow.Run()
+--- Main.lua
+--- Wed 15 Nov 20:01 2023
+---
 
-Game.LoadModule("GameWindow")
+Config = { 
+    width = 800, height = 900, title = "Remilia Scarlet", fullscreen = true 
+}
+
+Game.CreateWindow()

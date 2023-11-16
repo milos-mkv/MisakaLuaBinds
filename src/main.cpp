@@ -124,32 +124,12 @@ static int Entity_Create(lua_State *L)
 	return 1;
 }
 
+#include <engine/Engine.hpp>
+
 int main(int argc, char const *argv[])
 {
-    Game::CreateGame();
-
-    ScriptComponent* script = new ScriptComponent("../scripts/script.lua");
-
-    // lua_State* L = luaL_newstate();
-    // luaL_openlibs(L);
-
-    // RegisterEntity(L);
-
-    // static const luaL_Reg Static[] = {
-	// 	{ "Create",   Entity_Create },
-	// 	{ NULL,		NULL },
-	// };
-    // luaL_setfuncs(L, Static, 0);
-	// lua_setglobal(L, "Entity");
-
-    // lua_RegisterGameWindow(L);
-
-    // if (LuaStateCheckIfOK(L, luaL_dofile(L, "../scripts/script.lua")))
-    // {
-
-    // }
-
-    // lua_close(L);
+    Engine::CreateEngine();
+    Engine::Get()->Run();
 
     return EXIT_SUCCESS;
 }
