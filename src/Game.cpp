@@ -1,5 +1,6 @@
 #include <Game.hpp>
 #include <Utils.hpp>
+#include <utils/Logger.hpp>
 #include <GLFW/glfw3.h>
 #include <GameWindow.hpp>
 
@@ -11,7 +12,7 @@ void Game::CreateGame()
 
 Game::Game()
 {
-    Log("Initialize Game!");
+    LOG("Initialize Game!");
     glfwInit();
 }
 

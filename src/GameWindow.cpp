@@ -1,5 +1,5 @@
 #include <GameWindow.hpp>
-
+#include <utils/Logger.hpp>
 #include <lua.hpp>
 
 void GameWindow::CreateGameWindow(int width, int height, const char* title)
@@ -11,13 +11,13 @@ void GameWindow::CreateGameWindow(int width, int height, const char* title)
 GameWindow::GameWindow(int width, int height, const char* title)
     : m_width(width), m_height(height), m_title(title)
 {
-    Log("Game Window constructor: width=", width, "height=", height, "title=", title); 
+    LOG("Game Window constructor: width=", width, "height=", height, "title=", title); 
     m_window = glfwCreateWindow(m_width, m_height, m_title.c_str(), NULL, NULL);
 }
 
 void GameWindow::Run()
 {
-    Log("Game Window run.");
+    LOG("Game Window run.");
 
     while(!glfwWindowShouldClose(m_window))
     {
@@ -41,7 +41,7 @@ static int lua_CreateGameWindow(lua_State* state)
             break;
         }  
         default:
-            Log("lua_CreateGameWindow number of params=", paramCount, "exected=", 3);
+            LOG("lua_CreateGameWindow number of params=", paramCount, "exected=", 3);
     }
     return 0;
 }

@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <GLFW/glfw3.h>
+#include "ui/EngineUI.hpp"
 
 class Engine
 {
@@ -12,13 +13,18 @@ private:
 public:
     GLFWwindow* m_window;
 
-    static void CreateEngine();
-    static std::shared_ptr<Engine> Get() { return s_instance; }
+    static std::shared_ptr<Engine> Get();
 
     Engine();
    ~Engine();
 
     void Run();
+
+private:
+    void InitializeGLFW();
+    void InitializeImGui();
+    void SetStyleForImGui();
+    void RenderImGui();
 };
 
 #endif

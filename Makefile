@@ -1,5 +1,5 @@
 CXX      	 := g++
-CPPFLAGS   	 := -std=c++20 -arch x86_64
+CPPFLAGS   	 := -std=c++20 -arch x86_64 -D GL_SILENCE_DEPRECATION -D STB_IMAGE_IMPLEMENTATION
 LIBS 	 	 := -L./libs/lua -llua52 -L./libs/glfw/lib-x86_64 -lglfw3
 INCLUDE      := -I./libs/lua/include -I./libs/glfw/include -I./include -I./libs/imgui -I./libs/imgui/backends \
 				-I./libs/dirent -I./libs/stb -I./libs
