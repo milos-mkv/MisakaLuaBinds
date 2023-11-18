@@ -131,6 +131,7 @@ void Engine::InitializeGLFW()
         LOG("GLFW Frame buffer size callback:", width, height);
         glViewport(0, 0, width, height);
     });
+    // glfwSwapInterval(1);
 }
 
 void Engine::InitializeImGui()

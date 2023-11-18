@@ -7,16 +7,9 @@
 #include <vector>
 #include <filesystem>
 #include <fstream>
+#include <engine/gl/Texture.hpp>
 
-struct DirectoryNode
-{
-	std::string FullPath;
-	std::string FileName;
-	std::vector<DirectoryNode> Children;
-	bool IsDirectory;
-};
-
-static void RecursivelyAddDirectoryNodes(DirectoryNode& parentNode, std::filesystem::directory_iterator directoryIterator)
+void DirectoryViewDock::RecursivelyAddDirectoryNodes(DirectoryNode& parentNode, std::filesystem::directory_iterator directoryIterator)
 {
 	for (const std::filesystem::directory_entry& entry : directoryIterator)
 	{
@@ -31,7 +24,7 @@ static void RecursivelyAddDirectoryNodes(DirectoryNode& parentNode, std::filesys
 	std::sort(parentNode.Children.begin(), parentNode.Children.end(), moveDirectoriesToFront);
 }
 
-static DirectoryNode CreateDirectryNodeTreeFromPath(const std::filesystem::path& rootPath)
+DirectoryNode DirectoryViewDock::CreateDirectryNodeTreeFromPath(const std::filesystem::path& rootPath)
 {
 	DirectoryNode rootNode;
 	rootNode.FullPath = rootPath.c_str();
@@ -42,15 +35,15 @@ static DirectoryNode CreateDirectryNodeTreeFromPath(const std::filesystem::path&
 	return rootNode;
 }
 
-static void RecursivelyDisplayDirectoryNode(const DirectoryNode& parentNode)
+void DirectoryViewDock::RecursivelyDisplayDirectoryNode(const DirectoryNode& parentNode)
 {
 	ImGui::PushID(&parentNode);
 	if (parentNode.IsDirectory)
 	{
-        // auto cur = ImGui::GetCursorPos();
-        // cur.x += 4;
-        // cur.y += 2;
-		if (ImGui::TreeNodeEx(parentNode.FileName.c_str(), ImGuiTreeNodeFlags_SpanFullWidth))
+        auto cur = ImGui::GetCursorPos();
+        cur.x += 30;
+        cur.y += 2;
+		if (ImGui::TreeNodeEx(("  " + parentNode.FileName).c_str(), ImGuiTreeNodeFlags_SpanFullWidth))
 		{
 			for (const DirectoryNode& childNode : parentNode.Children)
 			{	
@@ -59,39 +52,59 @@ static void RecursivelyDisplayDirectoryNode(const DirectoryNode& parentNode)
 
 			ImGui::TreePop();
 		}
-        // auto cur2 = ImGui::GetCursorPos();
-        // ImGui::SetCursorPos(cur);
-        // ImGui::Image((ImTextureID) (id1.id), {20, 20}); 
-        // ImGui::SetCursorPos(cur2);
+        auto cur2 = ImGui::GetCursorPos();
+        ImGui::SetCursorPos(cur);
+        ImGui::Image((ImTextureID) (m_icons["Folder"].id), {20, 20}); 
+        ImGui::SetCursorPos(cur2);
 	}
 	else
 	{
-        // auto cur = ImGui::GetCursorPos();
-        // auto cur2 = cur;
-        // cur.x += 4;
+        auto cur = ImGui::GetCursorPos();
+        auto cur2 = cur;
+        // cur.x += 30;
         // cur.y += 2;
-        // ImGui::SetCursorPos(cur);
+        // ImGui::SetCursorPos(cur);        
+        ImGui::SetCursorPosX(0);
+        // ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0, 0});
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.25f, 0.25f, 0.25f, 1.00f));
+        if (ImGui::Button(("###  " + parentNode.FileName).c_str(), ImVec2(-1, 25)))
+        {
+            LOG(parentNode.FullPath);
+        }
+        ImGui::PopStyleColor(2);
+        ImGui::SameLine();
 
-        // ImGui::Image((ImTextureID) (id2.id), {20, 20}); 
-        // ImGui::SameLine();
-        // ImGui::SetCursorPos(cur2);
-		if (ImGui::TreeNodeEx(parentNode.FileName.c_str(), ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_SpanFullWidth))
-		{
-		}
+        cur.x += 30;
+        cur.y += 2;
+        ImGui::SetCursorPos(cur);
+
+        ImGui::Image((ImTextureID) (m_icons["File"].id), {20, 20}); 
+        ImGui::SameLine();
+        cur2.y -= 4;
+        ImGui::SetCursorPos(cur2);
+
+        ImGui::Text(("     " + parentNode.FileName).c_str());
+        // ImGui::PopStyleVar();
 
 	}
 	ImGui::PopID();
 }
-DirectoryNode rootNode;
+
 DirectoryViewDock::DirectoryViewDock()
 {
     std::filesystem::path sss("/Users/milos.milicevic/Documents/GitHub/MisakaLuaBinds");
     rootNode = CreateDirectryNodeTreeFromPath(sss);
+
+    m_icons.insert(std::make_pair<std::string, Texture>("Folder", Texture::CreateTexture("./folder.png")));
+    m_icons.insert(std::make_pair<std::string, Texture>("File", Texture::CreateTexture("./file.png")));
 }
 
 void DirectoryViewDock::Render()
 {
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
     ImGui::Begin("Directory View");
     RecursivelyDisplayDirectoryNode(rootNode);
     ImGui::End();
+    ImGui::PopStyleVar();
 }
