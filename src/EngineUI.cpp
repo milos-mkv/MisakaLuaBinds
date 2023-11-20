@@ -1,22 +1,25 @@
 #include <engine/ui/EngineUI.hpp>
-
-#include <utils/Logger.hpp>
 #include <engine/ui/docks/DirectoryViewDock.hpp>
+#include <engine/ui/docks/CodeEditorDock.hpp>
+#include <engine/ui/EngineMainMenuBar.hpp>
+#include <utils/Logger.hpp>
 #include <memory>
+
 std::shared_ptr<EngineUI> EngineUI::Get()
 {
     if (s_instance == nullptr)
         s_instance = std::make_shared<EngineUI>();
     return s_instance;
 }
-    
+
 EngineUI::EngineUI()
 {
     LOG("Initialize engine UI!");
-    m_uiDocks.insert(
-        std::make_pair<std::string, std::shared_ptr<EngineUIDockComponent>>("Directory view", std::make_shared<DirectoryViewDock>())
-        );
+    m_uiDocks[typeid(EngineMainMenuBar)] = std::make_shared<EngineMainMenuBar>();
+    m_uiDocks[typeid(DirectoryViewDock)] = std::make_shared<DirectoryViewDock>();
 }
+
+
 EngineUI::~EngineUI()
 {
     LOG("Destroy engine UI!");
@@ -24,9 +27,17 @@ EngineUI::~EngineUI()
 
 void EngineUI::Render()
 {
-    // LOG("EngineUI::Render");
     for(const auto& [key, value] : m_uiDocks)
     {
         value->Render();
+    }
+}
+
+void EngineUI::Destroy()
+{
+    LOG("EngineUI::Destroy");
+    for(const auto& [key, value] : s_instance->m_uiDocks)
+    {
+        value->Destroy();
     }
 }

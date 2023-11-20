@@ -14,6 +14,8 @@
     #include <TextEditor.h>
     #include <fstream>
     #include <filesystem>
+    #include <FontAwesomeIcons.hpp>
+    #include <engine/ui/EngineUI.hpp>
 
 #pragma endregion
 
@@ -50,8 +52,20 @@ void Engine::Run()
 	}
 
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-    ImFont* pFont = io.Fonts->AddFontFromFileTTF("./JetBrainsMono-Bold.ttf", 25.0f);
+    // ImFont* font = io.Fonts->AddFontDefault();
+    ImFontConfig config1;
+    config1.OversampleH = 4;
+    config1.OversampleV = 4;
+    config1.PixelSnapH = false;
 
+    io.Fonts->AddFontFromFileTTF("./Roboto-Regular.ttf", 20, &config1);
+    const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+    ImFontConfig config;
+    config.MergeMode = true;
+    io.Fonts->AddFontFromFileTTF("./fontawesome-webfont.ttf", 20.0f, &config, icon_ranges);             // Merge into first font
+    io.Fonts->Build();
+
+    EngineUI::Get()->font = io.Fonts->AddFontFromFileTTF("./JetBrainsMono-ExtraBold.ttf", 20);
 
    
 
@@ -85,14 +99,13 @@ void Engine::RenderImGui()
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-
 }
 
 Engine::~Engine()
 {
     LOG("Engine destroy!");
-    
+    EngineUI::Get()->Destroy();
+
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
@@ -152,13 +165,14 @@ void Engine::InitializeImGui()
 void Engine::SetStyleForImGui()
 {
     LOG("Engine::SetStyleForImGui");
+    auto bgColor = ImVec4(0.0941,0.0941,0.0941, 1.00f);
     ImGuiStyle& style = ImGui::GetStyle();
     style.Colors[ImGuiCol_Text]                  = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
     style.Colors[ImGuiCol_TextDisabled]          = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
-    style.Colors[ImGuiCol_WindowBg]              = ImVec4(0.13f, 0.14f, 0.15f, 1.00f);
+    style.Colors[ImGuiCol_WindowBg]              = bgColor;
     style.Colors[ImGuiCol_ChildBg]               = ImVec4(0.13f, 0.14f, 0.15f, 1.00f);
     style.Colors[ImGuiCol_PopupBg]               = ImVec4(0.13f, 0.14f, 0.15f, 1.00f);
-    style.Colors[ImGuiCol_Border]                = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
+    style.Colors[ImGuiCol_Border]                = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
     style.Colors[ImGuiCol_BorderShadow]          = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
     style.Colors[ImGuiCol_FrameBg]               = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
     style.Colors[ImGuiCol_FrameBgHovered]        = ImVec4(0.38f, 0.38f, 0.38f, 1.00f);
@@ -166,8 +180,8 @@ void Engine::SetStyleForImGui()
     style.Colors[ImGuiCol_TitleBg]               = ImVec4(0.08f, 0.08f, 0.09f, 1.00f);
     style.Colors[ImGuiCol_TitleBgActive]         = ImVec4(0.08f, 0.08f, 0.09f, 1.00f);
     style.Colors[ImGuiCol_TitleBgCollapsed]      = ImVec4(0.00f, 0.00f, 0.00f, 0.51f);
-    style.Colors[ImGuiCol_MenuBarBg]             = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
-    style.Colors[ImGuiCol_ScrollbarBg]           = ImVec4(0.02f, 0.02f, 0.02f, 0.53f);
+    style.Colors[ImGuiCol_MenuBarBg]             = bgColor;
+    style.Colors[ImGuiCol_ScrollbarBg]           = bgColor;
     style.Colors[ImGuiCol_ScrollbarGrab]         = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
     style.Colors[ImGuiCol_ScrollbarGrabHovered]  = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
     style.Colors[ImGuiCol_ScrollbarGrabActive]   = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
