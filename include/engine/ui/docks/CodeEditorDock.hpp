@@ -3,14 +3,17 @@
 
 #include <engine/ui/EngineUIDock.hpp>
 #include <string>
+#include <memory>
+#include <TextEditor.h>
 
 class CodeEditorDock : public EngineUIDock
 {
 public:
-    std::string path ="test";
-    CodeEditorDock() { }
-     void Render() override;
-     void Destroy() override { }
+    std::string path;
+    TextEditor* editor;
+    CodeEditorDock(const std::string& path);
+    void Render() override;
+    void Destroy() override { }
 
 };
 

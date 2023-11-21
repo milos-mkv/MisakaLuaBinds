@@ -3,6 +3,8 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#include <imgui_internal.h>
+
 #include <string>
 #include <vector>
 #include <filesystem>
@@ -12,56 +14,61 @@
 #include <engine/gl/Texture.hpp>
 #include <engine/ui/EngineUI.hpp>
 #include <utils/Logger.hpp>
+#include <thread>
 
-void DirectoryViewDock::RecursivelyAddDirectoryNodes(DirectoryNode& parentNode, std::filesystem::directory_iterator directoryIterator)
+void DirectoryViewDock::RecursivelyAddDirectoryNodes(const std::shared_ptr<DirectoryNode>& parentNode, std::filesystem::directory_iterator directoryIterator)
 {
+    LOG(parentNode->FullPath);
 	for (const std::filesystem::directory_entry& entry : directoryIterator)
 	{
-		DirectoryNode& childNode = parentNode.Children.emplace_back();
-		childNode.FullPath  = entry.path().c_str();
-		childNode.FileName  = entry.path().filename().c_str();
-        childNode.Extension = entry.path().extension().c_str();
+		std::shared_ptr<DirectoryNode> childNode = std::make_shared<DirectoryNode>();
+		childNode->FullPath  = entry.path().c_str();
+		childNode->FileName  = entry.path().filename().c_str();
+        childNode->Extension = entry.path().extension().c_str();
 
-		if (childNode.IsDirectory = entry.is_directory(); childNode.IsDirectory)
+        parentNode->Children.push_back(childNode);
+		if (childNode->IsDirectory = entry.is_directory(); childNode->IsDirectory)
 			RecursivelyAddDirectoryNodes(childNode, std::filesystem::directory_iterator(entry));
 	}
     
-    std::sort(parentNode.Children.begin(), parentNode.Children.end(),[](DirectoryNode& d1, DirectoryNode& d2){
-        return d1.FileName[0] < d2.FileName[0];
+    std::sort(parentNode->Children.begin(), parentNode->Children.end(),[](const std::shared_ptr<DirectoryNode>& d1, const std::shared_ptr<DirectoryNode>& d2){
+        return d1->FileName[0] < d2->FileName[0];
     });
 
-	auto moveDirectoriesToFront = [](const DirectoryNode& a, const DirectoryNode& b) { return (a.IsDirectory > b.IsDirectory); };
-	std::sort(parentNode.Children.begin(), parentNode.Children.end(), moveDirectoriesToFront);
+	auto moveDirectoriesToFront = [](const std::shared_ptr<DirectoryNode>& a, const std::shared_ptr<DirectoryNode>& b) { return (a->IsDirectory > b->IsDirectory); };
+	std::sort(parentNode->Children.begin(), parentNode->Children.end(), moveDirectoriesToFront);
 }
-
-DirectoryNode DirectoryViewDock::CreateDirectryNodeTreeFromPath(const std::filesystem::path& rootPath)
+std::shared_ptr<DirectoryNode> DirectoryViewDock::CreateDirectryNodeTreeFromPath(const std::filesystem::path& rootPath)
 {
-	DirectoryNode rootNode;
-	rootNode.FullPath  = rootPath.c_str();
-	rootNode.FileName  = rootPath.filename().c_str();
-    rootNode.Extension = rootPath.extension().c_str();
+	std::shared_ptr<DirectoryNode> rootNode = std::make_shared<DirectoryNode>();
+	rootNode->FullPath  = rootPath.c_str();
+	rootNode->FileName  = rootPath.filename().c_str();
+    rootNode->Extension = rootPath.extension().c_str();
 
-	if (rootNode.IsDirectory = std::filesystem::is_directory(rootPath); rootNode.IsDirectory)
-		RecursivelyAddDirectoryNodes(rootNode, std::filesystem::directory_iterator(rootPath));
-
+	if (rootNode->IsDirectory = std::filesystem::is_directory(rootPath); rootNode->IsDirectory)
+    {
+        if(directoryLoaderThread.joinable())
+        {    
+            directoryLoaderThread.join();
+        }
+		directoryLoaderThread = std::thread(&DirectoryViewDock::RecursivelyAddDirectoryNodes, this, rootNode, std::filesystem::directory_iterator(rootPath));
+    }
 	return rootNode;
 }
 
-
-
-void DirectoryViewDock::RecursivelyDisplayDirectoryNode(const DirectoryNode& parentNode)
+void DirectoryViewDock::RecursivelyDisplayDirectoryNode(const std::shared_ptr<DirectoryNode>& parentNode)
 {
 	ImGui::PushID(&parentNode);
-	if (parentNode.IsDirectory)
+	if (parentNode->IsDirectory)
 	{
         auto cur = ImGui::GetCursorPos();
         cur.x += 30;
         cur.y += 2;
-		if (ImGui::TreeNodeEx(("       " + parentNode.FileName).c_str(), ImGuiTreeNodeFlags_SpanFullWidth))
+		if (ImGui::TreeNodeEx(("       " + parentNode->FileName).c_str(), ImGuiTreeNodeFlags_SpanFullWidth))
 		{
-            OpenContextMenu(parentNode.FullPath.c_str(), true);
+            OpenContextMenu(parentNode->FullPath.c_str(), true);
 
-			for (const DirectoryNode& childNode : parentNode.Children)
+			for (const std::shared_ptr<DirectoryNode>& childNode : parentNode->Children)
 			{	
                 RecursivelyDisplayDirectoryNode(childNode);
             }
@@ -69,7 +76,7 @@ void DirectoryViewDock::RecursivelyDisplayDirectoryNode(const DirectoryNode& par
 		}
         else
         {
-            OpenContextMenu(parentNode.FullPath.c_str(), true);
+            OpenContextMenu(parentNode->FullPath.c_str(), true);
         }
         
 
@@ -84,7 +91,7 @@ void DirectoryViewDock::RecursivelyDisplayDirectoryNode(const DirectoryNode& par
         auto cur = ImGui::GetCursorPos();
         auto cur2 = cur;    
         ImGui::SetCursorPosX(0);
-        if (selectedFile == parentNode.FullPath)
+        if (selectedFile == parentNode->FullPath)
         {
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.25f, 0.25f, 0.25f, 1.00f));
         }
@@ -93,12 +100,15 @@ void DirectoryViewDock::RecursivelyDisplayDirectoryNode(const DirectoryNode& par
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
         }
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.25f, 0.25f, 0.25f, 1.00f));
-        if (ImGui::Button(("###  " + parentNode.FileName).c_str(), ImVec2(-1, 25)))
+        if (ImGui::Button(("###  " + parentNode->FileName).c_str(), ImVec2(-1, 25)))
         {
-            LOG("File selected:", parentNode.FullPath);
-            selectedFile = parentNode.FullPath;
+            LOG("File selected:", parentNode->FullPath);
+            selectedFile = parentNode->FullPath;
+
+            EngineUI::Get()->OpenFile(selectedFile);
+
         }
-        OpenContextMenu(parentNode.FullPath.c_str(), false);
+        OpenContextMenu(parentNode->FullPath.c_str(), false);
         ImGui::PopStyleColor(2);
         ImGui::SameLine();
 
@@ -106,10 +116,10 @@ void DirectoryViewDock::RecursivelyDisplayDirectoryNode(const DirectoryNode& par
         cur.y += 6;
         ImGui::SetCursorPos(cur);
 
-        ImGui::Image((ImTextureID) (m_icons[ parentNode.Extension == ".lua" ? "Lua" : "File"].id), {16, 16}); 
+        ImGui::Image((ImTextureID) (m_icons["File"].id), {16, 16}); 
         ImGui::SameLine();
         ImGui::SetCursorPos(cur2);
-        ImGui::Text(("             "  + parentNode.FileName).c_str());
+        ImGui::Text(("             "  + parentNode->FileName).c_str());
 	}
 	ImGui::PopID();
 }
@@ -119,6 +129,7 @@ DirectoryViewDock::DirectoryViewDock()
     m_icons.insert(std::make_pair<std::string, Texture>("Folder", Texture::CreateTexture("./folder.png")));
     m_icons.insert(std::make_pair<std::string, Texture>("File", Texture::CreateTexture("./file.png")));
     m_icons.insert(std::make_pair<std::string, Texture>("Lua", Texture::CreateTexture("./lua.png")));
+    OpenFolder("..");
 }
 
 void DirectoryViewDock::Destroy()
@@ -126,6 +137,11 @@ void DirectoryViewDock::Destroy()
     Texture::DestroyTexture(m_icons["Folder"]);
     Texture::DestroyTexture(m_icons["File"]);
     Texture::DestroyTexture(m_icons["Lua"]);
+
+    if(directoryLoaderThread.joinable())
+    {
+        directoryLoaderThread.join();
+    }
 }
 
 void DirectoryViewDock::OpenFolder(const char* path)
@@ -140,24 +156,29 @@ void DirectoryViewDock::OpenFolder(const char* path)
 void DirectoryViewDock::Render()
 {   
     ImGuiWindowClass window_class;
-    window_class.DockNodeFlagsOverrideSet = 1 << 12 ;
+    window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoDockingOverMe 
+                                          | ImGuiDockNodeFlags_NoCloseButton
+                                          ;
     ImGui::SetNextWindowClass(&window_class);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
     bool a = true;
-    ImGui::Begin("Directory View", &a);
-    ImGui::Separator();
-    ImGui::PushFont(EngineUI::Get()->font);
+
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5, 0.5, 0.5f, 1.0f));
-    ImGui::Text(" FOLDERS");
-    ImGui::PopStyleColor();
-    ImGui::PopFont();
+    ImGui::PushFont(EngineUI::Get()->font);
+    ImGui::Begin("FOLDERS", &a, ImGuiWindowFlags_NoCollapse);
+    ImGui::PushFont(ImGui::GetDefaultFont());
 
     if (!currentFolder.empty())
     {
         RecursivelyDisplayDirectoryNode(rootNode);
     }
+        ImGui::PopFont();
+
     ImGui::End();
+     ImGui::PopStyleColor();
+
     ImGui::PopStyleVar();
+    ImGui::PopFont();
 
 }
 

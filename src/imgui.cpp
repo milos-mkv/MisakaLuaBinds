@@ -18151,6 +18151,7 @@ ImGuiID ImGui::DockSpaceOverViewport(const ImGuiViewport* viewport, ImGuiDockNod
     PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
     PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
     Begin(label, NULL, host_window_flags);
+
     PopStyleVar(3);
 
     ImGuiID dockspace_id = GetID("DockSpace");

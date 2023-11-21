@@ -11,6 +11,7 @@ private:
     static inline std::shared_ptr<Engine> s_instance = nullptr;
 
 public:
+    static inline ImGuiID DID;
     GLFWwindow* m_window;
 
     static std::shared_ptr<Engine> Get();

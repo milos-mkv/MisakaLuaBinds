@@ -11,6 +11,7 @@
     #include <imgui.h>
     #include <imgui_impl_glfw.h>
     #include <imgui_impl_opengl3.h>
+    #include <imgui_internal.h>
     #include <TextEditor.h>
     #include <fstream>
     #include <filesystem>
@@ -91,14 +92,18 @@ void Engine::RenderImGui()
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();  
     ImGui::NewFrame();
-    ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
-
+    DID = ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
     // Add UI;
     EngineUI::Get()->Render();
 
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    GLFWwindow* backup_current_context = glfwGetCurrentContext();
+    ImGui::UpdatePlatformWindows();
+    ImGui::RenderPlatformWindowsDefault();
+    glfwMakeContextCurrent(backup_current_context);
 }
 
 Engine::~Engine()
@@ -154,12 +159,13 @@ void Engine::InitializeImGui()
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; 
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
 
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
     ImGui_ImplOpenGL3_Init("#version 150");
 
     SetStyleForImGui();
+
 }
 
 void Engine::SetStyleForImGui()
@@ -177,9 +183,9 @@ void Engine::SetStyleForImGui()
     style.Colors[ImGuiCol_FrameBg]               = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
     style.Colors[ImGuiCol_FrameBgHovered]        = ImVec4(0.38f, 0.38f, 0.38f, 1.00f);
     style.Colors[ImGuiCol_FrameBgActive]         = ImVec4(0.67f, 0.67f, 0.67f, 0.39f);
-    style.Colors[ImGuiCol_TitleBg]               = ImVec4(0.08f, 0.08f, 0.09f, 1.00f);
-    style.Colors[ImGuiCol_TitleBgActive]         = ImVec4(0.08f, 0.08f, 0.09f, 1.00f);
-    style.Colors[ImGuiCol_TitleBgCollapsed]      = ImVec4(0.00f, 0.00f, 0.00f, 0.51f);
+    style.Colors[ImGuiCol_TitleBg]               = bgColor;
+    style.Colors[ImGuiCol_TitleBgActive]         = bgColor;
+    style.Colors[ImGuiCol_TitleBgCollapsed]      = bgColor;
     style.Colors[ImGuiCol_MenuBarBg]             = bgColor;
     style.Colors[ImGuiCol_ScrollbarBg]           = bgColor;
     style.Colors[ImGuiCol_ScrollbarGrab]         = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);

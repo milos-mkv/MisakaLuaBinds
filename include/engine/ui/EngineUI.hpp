@@ -8,6 +8,7 @@
 #include <imgui.h>
 #include <typeindex>
 #include <engine/components/RenderableComponent.hpp>
+#include <engine/ui/docks/CodeEditorDock.hpp>
 
 class EngineUI
 {
@@ -22,6 +23,7 @@ public:
     EngineUI(); /* CTOR */
    ~EngineUI(); /* DTOR */
 
+    void OpenFile(const std::string& path);
 
     void Render() ;
     template<typename TDock>
@@ -32,6 +34,7 @@ public:
 
 public:
     std::unordered_map<std::type_index, std::shared_ptr<EngineUIDock>> m_uiDocks;
+    std::unordered_map<std::string, std::shared_ptr<CodeEditorDock>> m_codeEditors;
 
 
 };

@@ -8,7 +8,8 @@
 #include <vector>
 #include <filesystem>
 #include <fstream>
-
+#include <atomic>
+#include <thread>
 
 struct DirectoryNode
 {
@@ -16,7 +17,7 @@ struct DirectoryNode
 	std::string FileName;
     std::string Extension;
 
-	std::vector<DirectoryNode> Children;
+	std::vector<std::shared_ptr<DirectoryNode>> Children;
 	bool IsDirectory;
 };
 
@@ -33,8 +34,9 @@ public:
 
 private:
     std::string currentFolder;
+    std::thread directoryLoaderThread;
 
-    DirectoryNode rootNode;
+    std::shared_ptr<DirectoryNode> rootNode;
     std::unordered_map<std::string, Texture> m_icons;
     std::string selectedFile;
 
@@ -42,9 +44,9 @@ private:
     void OpenFileContextMenu(const char* id);
     void OpenFolderContextMenu(const char* id);
     
-    void RecursivelyAddDirectoryNodes(DirectoryNode& parentNode, std::filesystem::directory_iterator directoryIterator);
-    DirectoryNode CreateDirectryNodeTreeFromPath(const std::filesystem::path& rootPath);
-    void RecursivelyDisplayDirectoryNode(const DirectoryNode& parentNode);
+    void RecursivelyAddDirectoryNodes(const std::shared_ptr<DirectoryNode>& parentNode, std::filesystem::directory_iterator directoryIterator);
+    std::shared_ptr<DirectoryNode> CreateDirectryNodeTreeFromPath(const std::filesystem::path& rootPath);
+    void RecursivelyDisplayDirectoryNode(const std::shared_ptr<DirectoryNode>& parentNode);
 };
 
 #endif

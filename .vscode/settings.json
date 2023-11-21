@@ -61,6 +61,7 @@
         "map": "cpp",
         "regex": "cpp",
         "unordered_set": "cpp",
-        "typeindex": "cpp"
+        "typeindex": "cpp",
+        "thread": "cpp"
     }
 }
