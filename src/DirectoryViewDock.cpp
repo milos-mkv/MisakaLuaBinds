@@ -104,8 +104,7 @@ void DirectoryViewDock::RecursivelyDisplayDirectoryNode(const std::shared_ptr<Di
         {
             LOG("File selected:", parentNode->FullPath);
             selectedFile = parentNode->FullPath;
-
-            EngineUI::Get()->OpenFile(selectedFile);
+            EngineUI::Get()->OpenFile(parentNode->FullPath, parentNode->FileName, parentNode->Extension);
 
         }
         OpenContextMenu(parentNode->FullPath.c_str(), false);
@@ -156,29 +155,27 @@ void DirectoryViewDock::OpenFolder(const char* path)
 void DirectoryViewDock::Render()
 {   
     ImGuiWindowClass window_class;
-    window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoDockingOverMe 
-                                          | ImGuiDockNodeFlags_NoCloseButton
+    window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoDockingOverMe | ImGuiDockNodeFlags_NoDockingSplit
+                                          | ImGuiDockNodeFlags_NoCloseButton | ImGuiDockNodeFlags_NoTabBar
                                           ;
     ImGui::SetNextWindowClass(&window_class);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-    bool a = true;
 
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5, 0.5, 0.5f, 1.0f));
-    ImGui::PushFont(EngineUI::Get()->font);
-    ImGui::Begin("FOLDERS", &a, ImGuiWindowFlags_NoCollapse);
-    ImGui::PushFont(ImGui::GetDefaultFont());
+    ImGui::Begin("Directory View");
+        ImGui::PushFont(EngineUI::Get()->font);
+    ImGui::Text(" FOLDERS");
+    ImGui::PopFont();
 
     if (!currentFolder.empty())
     {
         RecursivelyDisplayDirectoryNode(rootNode);
     }
-        ImGui::PopFont();
 
     ImGui::End();
      ImGui::PopStyleColor();
 
     ImGui::PopStyleVar();
-    ImGui::PopFont();
 
 }
 

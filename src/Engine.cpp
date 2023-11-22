@@ -206,11 +206,11 @@ void Engine::SetStyleForImGui()
     style.Colors[ImGuiCol_ResizeGrip]            = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
     style.Colors[ImGuiCol_ResizeGripHovered]     = ImVec4(0.29f, 0.30f, 0.31f, 0.67f);
     style.Colors[ImGuiCol_ResizeGripActive]      = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
-    style.Colors[ImGuiCol_Tab]                   = ImVec4(0.08f, 0.08f, 0.09f, 0.83f);
-    style.Colors[ImGuiCol_TabHovered]            = ImVec4(0.33f, 0.34f, 0.36f, 0.83f);
-    style.Colors[ImGuiCol_TabActive]             = ImVec4(0.23f, 0.23f, 0.24f, 1.00f);
-    style.Colors[ImGuiCol_TabUnfocused]          = ImVec4(0.08f, 0.08f, 0.09f, 1.00f);
-    style.Colors[ImGuiCol_TabUnfocusedActive]    = ImVec4(0.13f, 0.14f, 0.15f, 1.00f);
+    style.Colors[ImGuiCol_Tab]                   = bgColor; //ImGui::ColorConvertU32ToFloat4(4279242768); //ImVec4(1.08f, 0.08f, 0.09f, 0.83f);
+    style.Colors[ImGuiCol_TabHovered]            = ImGui::ColorConvertU32ToFloat4(4279242768);
+    style.Colors[ImGuiCol_TabActive]             = ImGui::ColorConvertU32ToFloat4(4279242768); //ImVec4(0.23f, 0.23f, 0.24f, 1.00f);
+    style.Colors[ImGuiCol_TabUnfocused]          = bgColor;
+    style.Colors[ImGuiCol_TabUnfocusedActive]    = ImGui::ColorConvertU32ToFloat4(4279242768);
     style.Colors[ImGuiCol_DockingPreview]        = ImVec4(0.26f, 0.59f, 0.98f, 0.70f);
     style.Colors[ImGuiCol_DockingEmptyBg]        = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
     style.Colors[ImGuiCol_PlotLines]             = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
@@ -224,6 +224,8 @@ void Engine::SetStyleForImGui()
     style.Colors[ImGuiCol_NavWindowingDimBg]     = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
     style.Colors[ImGuiCol_ModalWindowDimBg]      = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
     style.GrabRounding                           = style.FrameRounding = 2.3f;
+    // style.WindowMenuButtonPosition               = ImGuiDir_None;
+    style.TabRounding = 0;
 }
 
 #pragma endregion

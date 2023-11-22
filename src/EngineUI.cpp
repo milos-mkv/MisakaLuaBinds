@@ -1,6 +1,9 @@
 #include <engine/ui/EngineUI.hpp>
+
 #include <engine/ui/docks/DirectoryViewDock.hpp>
 #include <engine/ui/docks/CodeEditorDock.hpp>
+#include <engine/ui/docks/OpenedFilesDock.hpp>
+
 #include <engine/ui/EngineMainMenuBar.hpp>
 #include <utils/Logger.hpp>
 #include <imgui.h>
@@ -19,7 +22,8 @@ EngineUI::EngineUI()
     LOG("Initialize engine UI!");
     m_uiDocks[typeid(EngineMainMenuBar)] = std::make_shared<EngineMainMenuBar>();
     m_uiDocks[typeid(DirectoryViewDock)] = std::make_shared<DirectoryViewDock>();
-    // m_uiDocks[typeid(CodeEditorDock)]    = std::make_shared<CodeEditorDock>();
+    m_uiDocks[typeid(OpenedFilesDock)]   = std::make_shared<OpenedFilesDock>();
+
 }
 
 
@@ -34,16 +38,21 @@ void EngineUI::Render()
     {
         value->Render();
     }
-    for (const auto& [key, value] : m_codeEditors)
-    {
-        value->Render();
-    }
-
 }
 
-void EngineUI::OpenFile(const std::string& path)
+void EngineUI::OpenFile(const std::string& path, const std::string& fileName, const std::string& ext)
 {
-    m_codeEditors[path] = std::make_shared<CodeEditorDock>(path);
+    std::unordered_map<std::string, std::shared_ptr<CodeEditorDock>>::iterator i = m_codeEditors.find(path);
+    if (i == m_codeEditors.end())
+    {
+        m_codeEditors[path] = std::make_shared<CodeEditorDock>(path, fileName, ext);
+    }
+    else
+    {
+        m_codeEditors[path]->alive = true;
+        ImGui::SetWindowFocus(path.c_str());
+        LOG(path, "already opened!");
+    }
 }
 
 void EngineUI::Destroy()

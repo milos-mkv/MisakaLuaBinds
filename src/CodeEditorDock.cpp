@@ -7,16 +7,30 @@
 #include <imgui_internal.h>
 #include <fstream>
 #include <engine/Engine.hpp>
-
 #include <utils/Logger.hpp>
 
-CodeEditorDock::CodeEditorDock(const std::string& path)
-    : path(path)
+CodeEditorDock::CodeEditorDock(const std::string& path, const std::string& fileName, const std::string& ext)
+    : path(path), fileName(fileName), ext(ext)
 {
     LOG("CodeEditorDock::CodeEditorDock");
     editor = new TextEditor();
-	auto lang = TextEditor::LanguageDefinition::CPlusPlus();
-    editor->SetLanguageDefinition(lang);
+    if (ext == ".lua") 
+    {
+        auto lang = TextEditor::LanguageDefinition::Lua();
+        editor->SetLanguageDefinition(lang);
+    }
+    else if (ext == ".cpp" || ext == ".cc") 
+    {
+        auto lang = TextEditor::LanguageDefinition::CPlusPlus();
+        editor->SetLanguageDefinition(lang);
+    }
+    else if (ext == ".c") 
+    {
+        auto lang = TextEditor::LanguageDefinition::C();
+        editor->SetLanguageDefinition(lang);
+    }
+
+
 
 	std::ifstream file(path);
     if (file.good())
@@ -27,20 +41,32 @@ CodeEditorDock::CodeEditorDock(const std::string& path)
 	}
 }
 
-int a = true;
 void CodeEditorDock::Render()
 {
-
-    ImGui::SetNextWindowDockID(Engine::DID, ImGuiCond_Once);
-    ImGui::PushID(path.c_str());
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 });
-    ImGui::Begin(path.c_str());
+    if (!alive)
+    {
+        return;
+    }
     
+    // ImGui::SetNextWindowDockID(Engine::DID, ImGuiCond_Once);
+
+    // ImGui::PushID(path.c_str());
+    // ImGuiWindowClass window_class;
+    // window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoCloseButton |
+    // ImGuiDockNodeFlags_NoWindowMenuButton ;
+    
+    // ImGui::SetNextWindowClass(&window_class);
+        ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImGui::ColorConvertU32ToFloat4(4279242768));
+
     ImGui::PushFont(EngineUI::Get()->font);
+    // ImGui::Begin(path.c_str(), &alive, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_UnsavedDocument);
 
     editor->Render(path.c_str());
+
+    // ImGui::End();
     ImGui::PopFont();
-    ImGui::End();
-    ImGui::PopStyleVar();
-    ImGui::PopID();
+
+    ImGui::PopStyleColor();
+    // ImGui::PopID();
+    
 }

@@ -23,7 +23,7 @@ public:
     EngineUI(); /* CTOR */
    ~EngineUI(); /* DTOR */
 
-    void OpenFile(const std::string& path);
+    void OpenFile(const std::string& path, const std::string& fileName, const std::string& ext);
 
     void Render() ;
     template<typename TDock>

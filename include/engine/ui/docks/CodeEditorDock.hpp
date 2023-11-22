@@ -10,8 +10,11 @@ class CodeEditorDock : public EngineUIDock
 {
 public:
     std::string path;
+    std::string fileName;
+    std::string ext;
+    bool alive = true;
     TextEditor* editor;
-    CodeEditorDock(const std::string& path);
+    CodeEditorDock(const std::string& path, const std::string& fileName, const std::string& ext);
     void Render() override;
     void Destroy() override { }
 

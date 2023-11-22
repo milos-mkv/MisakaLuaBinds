@@ -867,7 +867,18 @@ void TextEditor::Render()
 	{
 		auto color = ImGui::ColorConvertU32ToFloat4(mPaletteBase[i]);
 		color.w *= ImGui::GetStyle().Alpha;
+		
+		if (i == (int) PaletteIndex::LineNumber)
+		{
+		mPalette[i] =  ImGui::ColorConvertFloat4ToU32({ 0.4, 0.4, 0.4, 1.0 });
+
+		}
+		else
+		{
 		mPalette[i] = ImGui::ColorConvertFloat4ToU32(color);
+
+		}
+
 	}
 
 	assert(mLineBuffer.empty());

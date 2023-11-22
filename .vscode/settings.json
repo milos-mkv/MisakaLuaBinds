@@ -62,6 +62,7 @@
         "regex": "cpp",
         "unordered_set": "cpp",
         "typeindex": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "__memory": "cpp"
     }
 }
