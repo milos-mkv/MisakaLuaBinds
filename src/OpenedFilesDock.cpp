@@ -29,10 +29,18 @@ void OpenedFilesDock::Render()
     ImGui::Begin("Opened Files");
     ImGui::PushFont(EngineUI::Get()->font);
     ImGui::Text("OPEN FILES");
+
     ImGui::PopFont();
-    
-    ImGui::Text("   ");
+
     ImGui::SameLine();
+    ImGui::SetCursorPosX(ImGui::GetWindowSize().x - 45);
+    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
+    ImGui::PushStyleColor(ImGuiCol_Text, { 0, 0.5, 0, 1});
+    ImGui::Button("  " ICON_FA_PLAY " ");
+    ImGui::PopStyleColor();
+    
+    // ImGui::Text("   ");
+    // ImGui::SameLine();
 
     ImGui::PushStyleVar(ImGuiStyleVar_TabRounding, 5);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, { 0, 0 });

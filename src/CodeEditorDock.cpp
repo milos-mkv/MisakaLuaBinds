@@ -5,6 +5,7 @@
 #include <imgui_impl_opengl3.h>
 #include <engine/ui/EngineUI.hpp>
 #include <imgui_internal.h>
+#include <string>
 #include <fstream>
 #include <engine/Engine.hpp>
 #include <utils/Logger.hpp>
@@ -29,8 +30,6 @@ CodeEditorDock::CodeEditorDock(const std::string& path, const std::string& fileN
         auto lang = TextEditor::LanguageDefinition::C();
         editor->SetLanguageDefinition(lang);
     }
-
-
 
 	std::ifstream file(path);
     if (file.good())
@@ -62,8 +61,10 @@ void CodeEditorDock::Render()
     // ImGui::Begin(path.c_str(), &alive, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_UnsavedDocument);
 
     editor->Render(path.c_str());
-
     // ImGui::End();
+    // auto cor = editor->GetCursorPosition();
+    // LOG(cor.mLine, cor.mColumn);
+    // ImGui::Text(std::to_string(cor.mColumn).c_str());
     ImGui::PopFont();
 
     ImGui::PopStyleColor();

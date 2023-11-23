@@ -3,6 +3,7 @@
 #include <engine/ui/docks/DirectoryViewDock.hpp>
 #include <engine/ui/docks/CodeEditorDock.hpp>
 #include <engine/ui/docks/OpenedFilesDock.hpp>
+#include <engine/ui/docks/StatusBarDock.hpp>
 
 #include <engine/ui/EngineMainMenuBar.hpp>
 #include <utils/Logger.hpp>
@@ -23,6 +24,7 @@ EngineUI::EngineUI()
     m_uiDocks[typeid(EngineMainMenuBar)] = std::make_shared<EngineMainMenuBar>();
     m_uiDocks[typeid(DirectoryViewDock)] = std::make_shared<DirectoryViewDock>();
     m_uiDocks[typeid(OpenedFilesDock)]   = std::make_shared<OpenedFilesDock>();
+    m_uiDocks[typeid(StatusBarDock)]   = std::make_shared<StatusBarDock>();
 
 }
 
