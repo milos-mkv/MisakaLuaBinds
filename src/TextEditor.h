@@ -9,7 +9,7 @@
 #include <map>
 #include <regex>
 #include "imgui.h"
-
+#include <thread>
 class TextEditor
 {
 public:
@@ -182,6 +182,8 @@ public:
 		static const LanguageDefinition& Lua();
 	};
 
+	// std::thread coloringThread;
+	// void COLORTEXT();
 	TextEditor();
 	~TextEditor();
 

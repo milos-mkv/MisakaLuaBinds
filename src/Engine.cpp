@@ -52,23 +52,7 @@ void Engine::Run()
 		}
 	}
 
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    // ImFont* font = io.Fonts->AddFontDefault();
-    ImFontConfig config1;
-    config1.OversampleH = 4;
-    config1.OversampleV = 4;
-    config1.PixelSnapH = false;
-
-    io.Fonts->AddFontFromFileTTF("./Roboto-Regular.ttf", 20, &config1);
-    const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
-    ImFontConfig config;
-    config.MergeMode = true;
-    io.Fonts->AddFontFromFileTTF("./fontawesome-webfont.ttf", 20.0f, &config, icon_ranges);             // Merge into first font
-    io.Fonts->Build();
-
-    EngineUI::Get()->font = io.Fonts->AddFontFromFileTTF("./JetBrainsMono-ExtraBold.ttf", 20);
-
-   
+    EngineUI::Get();
 
     // id1 = Texture::CreateTexture("./folder.png");
     // id2 = Texture::CreateTexture("./file.png");
@@ -92,6 +76,7 @@ void Engine::RenderImGui()
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();  
     ImGui::NewFrame();
+    ImGui::SetNextWindowPos({-1, 100});
     DID = ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
     // Add UI;
     EngineUI::Get()->Render();
@@ -104,6 +89,7 @@ void Engine::RenderImGui()
     ImGui::UpdatePlatformWindows();
     ImGui::RenderPlatformWindowsDefault();
     glfwMakeContextCurrent(backup_current_context);
+    // LOG(ImGui::GetIO().Framerate);
 }
 
 Engine::~Engine()
@@ -159,7 +145,7 @@ void Engine::InitializeImGui()
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; 
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;// | ImGuiConfigFlags_ViewportsEnable;
 
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
     ImGui_ImplOpenGL3_Init("#version 150");
@@ -173,11 +159,11 @@ void Engine::SetStyleForImGui()
     LOG("Engine::SetStyleForImGui");
     auto bgColor = ImVec4(0.0941,0.0941,0.0941, 1.00f);
     ImGuiStyle& style = ImGui::GetStyle();
-    style.Colors[ImGuiCol_Text]                  = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+    style.Colors[ImGuiCol_Text]                  = ImVec4(1.00f, 1.00f,1.00f, 1.00f);
     style.Colors[ImGuiCol_TextDisabled]          = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
     style.Colors[ImGuiCol_WindowBg]              = bgColor;
     style.Colors[ImGuiCol_ChildBg]               = ImVec4(0.13f, 0.14f, 0.15f, 1.00f);
-    style.Colors[ImGuiCol_PopupBg]               = ImVec4(0.13f, 0.14f, 0.15f, 1.00f);
+    style.Colors[ImGuiCol_PopupBg]               = bgColor;//ImVec4(0.13f, 0.14f, 0.15f, 1.00f);
     style.Colors[ImGuiCol_Border]                = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
     style.Colors[ImGuiCol_BorderShadow]          = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
     style.Colors[ImGuiCol_FrameBg]               = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
@@ -222,7 +208,7 @@ void Engine::SetStyleForImGui()
     style.Colors[ImGuiCol_NavHighlight]          = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
     style.Colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
     style.Colors[ImGuiCol_NavWindowingDimBg]     = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
-    style.Colors[ImGuiCol_ModalWindowDimBg]      = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+    style.Colors[ImGuiCol_ModalWindowDimBg]      = ImVec4(0.00f, 0.00f, 0.00f, 0.75f);
     style.GrabRounding                           = style.FrameRounding = 2.3f;
     // style.WindowMenuButtonPosition               = ImGuiDir_None;
     style.TabRounding = 0;

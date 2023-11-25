@@ -9,7 +9,7 @@
 #include <typeindex>
 #include <engine/components/RenderableComponent.hpp>
 #include <engine/ui/docks/CodeEditorDock.hpp>
-
+#include <engine/ui/EngineAssetManager.hpp>
 class EngineUI
 {
 private: 
@@ -18,8 +18,9 @@ private:
 public:
     static std::shared_ptr<EngineUI> Get();
     static void Destroy();
-    ImFont* font;
 
+    std::shared_ptr<EngineAssetManager> assetManager;
+    
     EngineUI(); /* CTOR */
    ~EngineUI(); /* DTOR */
 

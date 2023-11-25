@@ -1,5 +1,7 @@
 #include <engine/ui/docks/DirectoryViewDock.hpp>
 
+
+#include <engine/ui/EngineAssetManager.hpp>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -83,7 +85,7 @@ void DirectoryViewDock::RecursivelyDisplayDirectoryNode(const std::shared_ptr<Di
         auto cur2 = ImGui::GetCursorPos();
         cur.y -= 2;
         ImGui::SetCursorPos(cur);
-        ImGui::Image((ImTextureID) (m_icons["Folder"].id), {20, 20}); 
+        ImGui::Image((ImTextureID) (EngineAssetManager::Get()->textures["Folder Icon"].id), {20, 20}); 
         ImGui::SetCursorPos(cur2);
 	}
 	else
@@ -115,7 +117,7 @@ void DirectoryViewDock::RecursivelyDisplayDirectoryNode(const std::shared_ptr<Di
         cur.y += 6;
         ImGui::SetCursorPos(cur);
 
-        ImGui::Image((ImTextureID) (m_icons["File"].id), {16, 16}); 
+        ImGui::Image((ImTextureID) (EngineAssetManager::Get()->textures["File Icon"].id), {16, 16}); 
         ImGui::SameLine();
         ImGui::SetCursorPos(cur2);
         ImGui::Text(("             "  + parentNode->FileName).c_str());
@@ -125,18 +127,14 @@ void DirectoryViewDock::RecursivelyDisplayDirectoryNode(const std::shared_ptr<Di
 
 DirectoryViewDock::DirectoryViewDock()
 {
-    m_icons.insert(std::make_pair<std::string, Texture>("Folder", Texture::CreateTexture("./folder.png")));
-    m_icons.insert(std::make_pair<std::string, Texture>("File", Texture::CreateTexture("./file.png")));
-    m_icons.insert(std::make_pair<std::string, Texture>("Lua", Texture::CreateTexture("./lua.png")));
+    // m_icons.insert(std::make_pair<std::string, Texture>("Folder", Texture::CreateTexture("./folder.png")));
+    // m_icons.insert(std::make_pair<std::string, Texture>("File", Texture::CreateTexture("./file.png")));
+    // m_icons.insert(std::make_pair<std::string, Texture>("Lua", Texture::CreateTexture("./lua.png")));
     OpenFolder("..");
 }
 
 void DirectoryViewDock::Destroy()
 {
-    Texture::DestroyTexture(m_icons["Folder"]);
-    Texture::DestroyTexture(m_icons["File"]);
-    Texture::DestroyTexture(m_icons["Lua"]);
-
     if(directoryLoaderThread.joinable())
     {
         directoryLoaderThread.join();
@@ -163,7 +161,7 @@ void DirectoryViewDock::Render()
 
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5, 0.5, 0.5f, 1.0f));
     ImGui::Begin("Directory View");
-        ImGui::PushFont(EngineUI::Get()->font);
+        ImGui::PushFont(EngineAssetManager::Get()->fonts["JetBrains"]);
     ImGui::Text(" FOLDERS");
     ImGui::PopFont();
 

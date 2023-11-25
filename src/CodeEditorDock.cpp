@@ -1,5 +1,5 @@
 #include <engine/ui/docks/CodeEditorDock.hpp>
-
+#include <engine/ui/EngineAssetManager.hpp>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -38,6 +38,8 @@ CodeEditorDock::CodeEditorDock(const std::string& path, const std::string& fileN
 		editor->SetText(str);
         file.close();
 	}
+
+    LOG("ASDAS");
 }
 
 void CodeEditorDock::Render()
@@ -57,7 +59,7 @@ void CodeEditorDock::Render()
     // ImGui::SetNextWindowClass(&window_class);
         ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImGui::ColorConvertU32ToFloat4(4279242768));
 
-    ImGui::PushFont(EngineUI::Get()->font);
+    ImGui::PushFont(EngineAssetManager::Get()->fonts["JetBrains"]);
     // ImGui::Begin(path.c_str(), &alive, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_UnsavedDocument);
 
     editor->Render(path.c_str());

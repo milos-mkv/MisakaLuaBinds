@@ -18,35 +18,36 @@
 
 void OpenedFilesDock::Render()
 {
-     ImGuiWindowClass window_class;
-    window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoDockingOverMe | ImGuiDockNodeFlags_NoDockingSplit
-                                          | ImGuiDockNodeFlags_NoCloseButton | ImGuiDockNodeFlags_NoTabBar
+     ImGuiWindowClass window_class; // | 
+    window_class.DockNodeFlagsOverrideSet =  ImGuiDockNodeFlags_NoDockingSplit | ImGuiDockNodeFlags_NoDockingOverMe | 
+                                          ImGuiDockNodeFlags_NoCloseButton | ImGuiDockNodeFlags_NoTabBar
                                           ;
     ImGui::SetNextWindowClass(&window_class);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(5, 0));
 
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5, 0.5, 0.5f, 1.0f));
     ImGui::Begin("Opened Files");
-    ImGui::PushFont(EngineUI::Get()->font);
+    ImGui::PushFont(EngineAssetManager::Get()->fonts["JetBrains"]);
     ImGui::Text("OPEN FILES");
-
     ImGui::PopFont();
 
-    ImGui::SameLine();
-    ImGui::SetCursorPosX(ImGui::GetWindowSize().x - 45);
-    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
-    ImGui::PushStyleColor(ImGuiCol_Text, { 0, 0.5, 0, 1});
-    ImGui::Button("  " ICON_FA_PLAY " ");
-    ImGui::PopStyleColor();
+    // ImGui::SameLine();
+    // ImGui::SetCursorPosX(ImGui::GetWindowSize().x - 45);
+    // ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
+    // ImGui::PushStyleColor(ImGuiCol_Text, { 0, 0.5, 0, 1});
+    // ImGui::Button("  " ICON_FA_PLAY " ");
+    // ImGui::PopStyleColor();
     
     // ImGui::Text("   ");
     // ImGui::SameLine();
+
+    if(EngineUI::Get()->m_codeEditors.size() > 0)
+    {
 
     ImGui::PushStyleVar(ImGuiStyleVar_TabRounding, 5);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, { 0, 0 });
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0, 0 });
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 10, 10 });
-
 
     ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_AutoSelectNewTabs 
     | ImGuiTabBarFlags_Reorderable 
@@ -70,6 +71,7 @@ void OpenedFilesDock::Render()
     }
     ImGui::PopStyleVar(4);
 
+}
 
     ImGui::End();
     ImGui::PopStyleVar();

@@ -1,9 +1,11 @@
 #include <engine/ui/EngineUI.hpp>
+#include <engine/ui/EngineAssetManager.hpp>
 
 #include <engine/ui/docks/DirectoryViewDock.hpp>
 #include <engine/ui/docks/CodeEditorDock.hpp>
 #include <engine/ui/docks/OpenedFilesDock.hpp>
 #include <engine/ui/docks/StatusBarDock.hpp>
+#include <engine/ui/docks/OutputDock.hpp>
 
 #include <engine/ui/EngineMainMenuBar.hpp>
 #include <utils/Logger.hpp>
@@ -21,10 +23,13 @@ std::shared_ptr<EngineUI> EngineUI::Get()
 EngineUI::EngineUI()
 {
     LOG("Initialize engine UI!");
+   assetManager =  EngineAssetManager::Get();
+
     m_uiDocks[typeid(EngineMainMenuBar)] = std::make_shared<EngineMainMenuBar>();
     m_uiDocks[typeid(DirectoryViewDock)] = std::make_shared<DirectoryViewDock>();
     m_uiDocks[typeid(OpenedFilesDock)]   = std::make_shared<OpenedFilesDock>();
-    m_uiDocks[typeid(StatusBarDock)]   = std::make_shared<StatusBarDock>();
+    m_uiDocks[typeid(StatusBarDock)]     = std::make_shared<StatusBarDock>();
+    m_uiDocks[typeid(OutputDock)]     = std::make_shared<OutputDock>();
 
 }
 
@@ -44,6 +49,7 @@ void EngineUI::Render()
 
 void EngineUI::OpenFile(const std::string& path, const std::string& fileName, const std::string& ext)
 {
+    LOG(path);
     std::unordered_map<std::string, std::shared_ptr<CodeEditorDock>>::iterator i = m_codeEditors.find(path);
     if (i == m_codeEditors.end())
     {
@@ -52,16 +58,19 @@ void EngineUI::OpenFile(const std::string& path, const std::string& fileName, co
     else
     {
         m_codeEditors[path]->alive = true;
-        ImGui::SetWindowFocus(path.c_str());
+        // ImGui::SetWindowFocus(path.c_str());
         LOG(path, "already opened!");
     }
 }
 
 void EngineUI::Destroy()
 {
+
     LOG("EngineUI::Destroy");
     for(const auto& [key, value] : s_instance->m_uiDocks)
     {
         value->Destroy();
     }
+    EngineAssetManager::Get()->Destroy();
+
 }

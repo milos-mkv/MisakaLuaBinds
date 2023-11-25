@@ -867,11 +867,14 @@ void TextEditor::Render()
 	{
 		auto color = ImGui::ColorConvertU32ToFloat4(mPaletteBase[i]);
 		color.w *= ImGui::GetStyle().Alpha;
-		
+		// if (i == (int) PaletteIndex::Background)
+		// {
+		// 	mPalette[i] =  ImGui::ColorConvertFloat4ToU32({ 1.4, 1.4, 1.4, 1.0 });
+		// }
+		// else 
 		if (i == (int) PaletteIndex::LineNumber)
 		{
-		mPalette[i] =  ImGui::ColorConvertFloat4ToU32({ 0.4, 0.4, 0.4, 1.0 });
-
+			mPalette[i] =  ImGui::ColorConvertFloat4ToU32({ 0.4, 0.4, 0.4, 1.0 });
 		}
 		else
 		{
@@ -1134,6 +1137,8 @@ void TextEditor::Render()
 	}
 }
 
+#include <thread>
+
 void TextEditor::Render(const char* aTitle, const ImVec2& aSize, bool aBorder)
 {
 	mWithinRender = true;
@@ -1154,6 +1159,7 @@ void TextEditor::Render(const char* aTitle, const ImVec2& aSize, bool aBorder)
 	if (mHandleMouseInputs)
 		HandleMouseInputs();
 
+	// std::thread* t = new std::thread(&TextEditor::ColorizeInternal, this);
 	ColorizeInternal();
 	Render();
 
@@ -2261,6 +2267,8 @@ void TextEditor::ColorizeRange(int aFromLine, int aToLine)
 		}
 	}
 }
+#include <iostream>
+
 
 void TextEditor::ColorizeInternal()
 {
@@ -2269,6 +2277,7 @@ void TextEditor::ColorizeInternal()
 
 	if (mCheckComments)
 	{
+
 		auto endLine = mLines.size();
 		auto endIndex = 0;
 		auto commentStartLine = endLine;
@@ -2280,10 +2289,13 @@ void TextEditor::ColorizeInternal()
 		auto concatenate = false;		// '\' on the very end of the line
 		auto currentLine = 0;
 		auto currentIndex = 0;
+	
+		std::cout << currentLine << ":" <<endLine << "\n";
+
 		while (currentLine < endLine || currentIndex < endIndex)
 		{
 			auto& line = mLines[currentLine];
-
+			
 			if (currentIndex == 0 && !concatenate)
 			{
 				withinSingleLineComment = false;
@@ -2391,6 +2403,7 @@ void TextEditor::ColorizeInternal()
 
 	if (mColorRangeMin < mColorRangeMax)
 	{
+		std::cout << "OTHER ONE" << std::endl;
 		const int increment = (mLanguageDefinition.mTokenize == nullptr) ? 10 : 10000;
 		const int to = std::min(mColorRangeMin + increment, mColorRangeMax);
 		ColorizeRange(mColorRangeMin, to);
@@ -2512,7 +2525,6 @@ void TextEditor::UndoRecord::Undo(TextEditor * aEditor)
 
 	aEditor->mState = mBefore;
 	aEditor->EnsureCursorVisible();
-
 }
 
 void TextEditor::UndoRecord::Redo(TextEditor * aEditor)
