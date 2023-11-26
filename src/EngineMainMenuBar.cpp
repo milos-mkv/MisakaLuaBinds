@@ -184,6 +184,7 @@ void EngineMainMenuBar::CreateNewProjectPopup()
         if(ImGui::Button("CREATE"))
         {
             OnCreateNewProjectConfirm(sProjectName, sProjectPath, current_item ? current_item : "");
+            ImGui::CloseCurrentPopup();
         }
         ImGui::SameLine();
         ImGui::SetCursorPos({ImGui::GetWindowSize().x - 145, ImGui::GetWindowSize().y - 35});
@@ -212,6 +213,8 @@ void EngineMainMenuBar::OnCreateNewProjectConfirm(const std::string& name, const
 
     std::filesystem::current_path(p);
     std::filesystem::create_directory(name.c_str());
-
+    std::ofstream ofs(path + "/" + name + "/main.lua");
+    ofs << "print(\"Hello world\")"; 
+    ofs.close();
     EngineUI::Get()->GetDock<DirectoryViewDock>()->OpenFolder((path + "/" + name).c_str());
 }
