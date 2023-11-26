@@ -20,7 +20,6 @@
 
 void DirectoryViewDock::RecursivelyAddDirectoryNodes(const std::shared_ptr<DirectoryNode>& parentNode, std::filesystem::directory_iterator directoryIterator)
 {
-    LOG(parentNode->FullPath);
 	for (const std::filesystem::directory_entry& entry : directoryIterator)
 	{
 		std::shared_ptr<DirectoryNode> childNode = std::make_shared<DirectoryNode>();

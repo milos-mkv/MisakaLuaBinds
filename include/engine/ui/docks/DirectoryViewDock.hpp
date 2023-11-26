@@ -32,7 +32,7 @@ public:
 
     void OpenFolder(const char* path);
 
-private:
+public:
     std::string currentFolder;
     std::thread directoryLoaderThread;
 

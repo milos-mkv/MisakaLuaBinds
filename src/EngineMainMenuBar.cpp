@@ -33,6 +33,11 @@ void EngineMainMenuBar::Render()
     if (ImGui::BeginMainMenuBar())
     {
         ImGui::PushStyleColor(ImGuiCol_Border, { 0.3, 0.3, 0.3, 1 });
+        ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 5);
+        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 15);
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 15);
+        ImGui::PushStyleColor(ImGuiCol_Text, { 0.8, 0.8, 0.8, 1.0});
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 15, 5});
 
         if (ImGui::BeginMenu("File"))
         {
@@ -40,10 +45,33 @@ void EngineMainMenuBar::Render()
             { 
                 openCreateNewProjectPopup = true;
             }
-            if (ImGui::MenuItem("Open Project", "Ctrl+O")) 
-            {
+                                 ImGui::Separator();
+
+            if (ImGui::MenuItem("New File")) 
+            { 
+            }
+            if (ImGui::MenuItem("Open File")) 
+            { 
+            }
+            if (ImGui::MenuItem("Open Folder")) 
+            { 
                 OpenFolder();
             }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Save File")) 
+            { 
+            }
+            if (ImGui::MenuItem("Save File As")) 
+            { 
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Close File")) 
+            { 
+            }
+            if (ImGui::MenuItem("Close All Files")) 
+            { 
+            }
+          
             ImGui::Separator();
             if (ImGui::MenuItem("Exit", "Ctrl+Q")) 
             {
@@ -51,7 +79,40 @@ void EngineMainMenuBar::Render()
             }
             ImGui::EndMenu();
         }
-        ImGui::PopStyleColor();
+        
+        if (ImGui::BeginMenu("Edit"))
+        {
+            if (ImGui::MenuItem(ICON_FA_UNDO "   Undo", "Ctrl+Z")) 
+            { 
+                LOG("Perform menu action - Undo");
+            }
+            if (ImGui::MenuItem(ICON_FA_REDO "   Redo", "Ctrl+Y")) 
+            { 
+                LOG("Perform menu action - Redo");
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem(ICON_FA_CUT "   Cut", "Ctrl+X")) 
+            {
+                LOG("Perform menu action - Cut");
+            }
+            if (ImGui::MenuItem(ICON_FA_COPY "   Copy", "Ctrl+C")) 
+            {
+                LOG("Perform menu action - Copy");
+
+            }
+            if (ImGui::MenuItem(ICON_FA_PASTE "   Paste", "Ctrl+V")) 
+            { 
+                LOG("Perform menu action - Paste");
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem(ICON_FA_SEARCH "   Find", "Ctrl+F")) 
+            { 
+                LOG("Perform menu action - Find");
+            }
+            ImGui::EndMenu();
+        }
+        ImGui::PopStyleColor(2);
+        ImGui::PopStyleVar(4);
         ImGui::EndMainMenuBar();
     }
 
@@ -216,5 +277,9 @@ void EngineMainMenuBar::OnCreateNewProjectConfirm(const std::string& name, const
     std::ofstream ofs(path + "/" + name + "/main.lua");
     ofs << "print(\"Hello world\")"; 
     ofs.close();
+
+    ofs = std::ofstream(path + "/" + name + "/project.json");
+    ofs.close();
+    
     EngineUI::Get()->GetDock<DirectoryViewDock>()->OpenFolder((path + "/" + name).c_str());
 }

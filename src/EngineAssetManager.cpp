@@ -12,6 +12,9 @@ std::shared_ptr<EngineAssetManager> EngineAssetManager::Get()
     return s_instance;
 }
 
+ImFontConfig config;
+ImFontConfig config1;
+
 EngineAssetManager::EngineAssetManager()
 {
     textures["File Icon"] = Texture::CreateTexture("file.png");
@@ -21,21 +24,20 @@ EngineAssetManager::EngineAssetManager()
 
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     // ImFont* font = io.Fonts->AddFontDefault();
-    ImFontConfig config1;
-    config1.OversampleH = 4;
-    config1.OversampleV = 4;
-    config1.PixelSnapH = false;
+    config.OversampleH = 4;
+    config.OversampleV = 4;
+    config.PixelSnapH = false;
+    fonts["JetBrains"] = io.Fonts->AddFontFromFileTTF("./JetBrainsMono-ExtraBold.ttf", 20, &config);
 
-    io.Fonts->AddFontFromFileTTF("./Roboto-Regular.ttf", 20, &config1);
+
+    io.FontDefault = io.Fonts->AddFontFromFileTTF("./Roboto-Regular.ttf", 20, &config);
     const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
-    ImFontConfig config;
     config.MergeMode = true;
     io.Fonts->AddFontFromFileTTF("./fontawesome-webfont.ttf", 20.0f, &config, icon_ranges);             // Merge into first font
     io.Fonts->Build();
+    fonts["Default"] = io.FontDefault;
+  
 
-    fonts["JetBrains"] = io.Fonts->AddFontFromFileTTF("./JetBrainsMono-ExtraBold.ttf", 20);
-
-   
 }
 EngineAssetManager::~EngineAssetManager()
 {

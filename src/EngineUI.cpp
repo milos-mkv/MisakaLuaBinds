@@ -29,7 +29,7 @@ EngineUI::EngineUI()
     m_uiDocks[typeid(DirectoryViewDock)] = std::make_shared<DirectoryViewDock>();
     m_uiDocks[typeid(OpenedFilesDock)]   = std::make_shared<OpenedFilesDock>();
     m_uiDocks[typeid(StatusBarDock)]     = std::make_shared<StatusBarDock>();
-    m_uiDocks[typeid(OutputDock)]     = std::make_shared<OutputDock>();
+    // m_uiDocks[typeid(OutputDock)]     = std::make_shared<OutputDock>();
 
 }
 
