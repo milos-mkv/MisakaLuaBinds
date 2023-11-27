@@ -10,19 +10,21 @@
 #include <engine/components/RenderableComponent.hpp>
 #include <engine/ui/docks/CodeEditorDock.hpp>
 #include <engine/ui/EngineAssetManager.hpp>
+
+#include <utils/Types.hpp>
 class EngineUI
 {
 private: 
-    static inline std::shared_ptr<EngineUI> s_instance = nullptr;
+    static inline PTR<EngineUI> s_instance = nullptr;
 
 public:
-    static std::shared_ptr<EngineUI> Get();
+    static PTR<EngineUI> Get();
     static void Destroy();
 
-    std::shared_ptr<EngineAssetManager> assetManager;
+    PTR<EngineAssetManager> m_assetManager;
     
-    EngineUI(); /* CTOR */
-   ~EngineUI(); /* DTOR */
+    EngineUI();
+   ~EngineUI();
 
     void OpenFile(const std::string& path, const std::string& fileName, const std::string& ext);
 

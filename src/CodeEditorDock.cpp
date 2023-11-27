@@ -38,8 +38,6 @@ CodeEditorDock::CodeEditorDock(const std::string& path, const std::string& fileN
 		editor->SetText(str);
         file.close();
 	}
-
-    LOG("ASDAS");
 }
 
 void CodeEditorDock::Render()
@@ -61,8 +59,9 @@ void CodeEditorDock::Render()
 
     ImGui::PushFont(EngineAssetManager::Get()->fonts["JetBrains"]);
     // ImGui::Begin(path.c_str(), &alive, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_UnsavedDocument);
-
     editor->Render(path.c_str());
+
+
     // ImGui::End();
     // auto cor = editor->GetCursorPosition();
     // LOG(cor.mLine, cor.mColumn);

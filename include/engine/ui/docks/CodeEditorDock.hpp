@@ -14,7 +14,7 @@ public:
     std::string ext;
     bool alive = true;
     TextEditor* editor;
-    CodeEditorDock(const std::string& path, const std::string& fileName, const std::string& ext);
+    CodeEditorDock(const std::string& path, const std::string& fileName = "", const std::string& ext = "");
     void Render() override;
     void Destroy() override { }
 

@@ -13,30 +13,29 @@
 #include <imgui_internal.h>
 #include <memory>
 
-std::shared_ptr<EngineUI> EngineUI::Get()
+PTR<EngineUI> EngineUI::Get()
 {
-    if (s_instance == nullptr)
-        s_instance = std::make_shared<EngineUI>();
+    if (s_instance == nullptr) 
+        s_instance = CreatePTR(EngineUI);
     return s_instance;
 }
 
 EngineUI::EngineUI()
 {
-    LOG("Initialize engine UI!");
-   assetManager =  EngineAssetManager::Get();
+    LOG("EngineUI::EngineUI");
 
-    m_uiDocks[typeid(EngineMainMenuBar)] = std::make_shared<EngineMainMenuBar>();
-    m_uiDocks[typeid(DirectoryViewDock)] = std::make_shared<DirectoryViewDock>();
-    m_uiDocks[typeid(OpenedFilesDock)]   = std::make_shared<OpenedFilesDock>();
-    m_uiDocks[typeid(StatusBarDock)]     = std::make_shared<StatusBarDock>();
-    // m_uiDocks[typeid(OutputDock)]     = std::make_shared<OutputDock>();
+    m_assetManager = EngineAssetManager::Get(); // Load all assets.
 
+    m_uiDocks[typeid(EngineMainMenuBar)] = CreatePTR(EngineMainMenuBar);
+    m_uiDocks[typeid(DirectoryViewDock)] = CreatePTR(DirectoryViewDock);
+    m_uiDocks[typeid(OpenedFilesDock  )] = CreatePTR(OpenedFilesDock  );
+    m_uiDocks[typeid(StatusBarDock    )] = CreatePTR(StatusBarDock    );
 }
 
 
 EngineUI::~EngineUI()
 {
-    LOG("Destroy engine UI!");
+    LOG("EngineUI::~EngineUI"); // NOTE: Use Destroy function to destruct object.
 }
 
 void EngineUI::Render()

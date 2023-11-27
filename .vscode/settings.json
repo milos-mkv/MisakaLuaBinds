@@ -64,6 +64,10 @@
         "typeindex": "cpp",
         "thread": "cpp",
         "__memory": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "forward_list": "cpp",
+        "list": "cpp",
+        "queue": "cpp",
+        "set": "cpp"
     }
 }

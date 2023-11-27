@@ -5,7 +5,10 @@
 #include <nfd.h>
 #include <utils/Logger.hpp>
 #include <engine/ui/EngineUI.hpp>
+
 #include <engine/ui/docks/DirectoryViewDock.hpp>
+#include <engine/ui/docks/OpenedFilesDock.hpp>
+
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_internal.h>
@@ -15,6 +18,7 @@
 #include <filesystem>
 #include <string>
 #include <utils/Logger.hpp>
+#include <engine/ui/EngineUIActions.hpp>
 
 EngineMainMenuBar::EngineMainMenuBar()
 {
@@ -41,17 +45,18 @@ void EngineMainMenuBar::Render()
 
         if (ImGui::BeginMenu("File"))
         {
-            if (ImGui::MenuItem("New Project", "Ctrl+P")) 
+            if (ImGui::MenuItem(ICON_FA_GAMEPAD "  New Project", "Ctrl+P")) 
             { 
                 openCreateNewProjectPopup = true;
             }
-                                 ImGui::Separator();
+            ImGui::Separator();
 
             if (ImGui::MenuItem("New File")) 
             { 
             }
             if (ImGui::MenuItem("Open File")) 
             { 
+                OpenFile();
             }
             if (ImGui::MenuItem("Open Folder")) 
             { 
@@ -73,7 +78,7 @@ void EngineMainMenuBar::Render()
             }
           
             ImGui::Separator();
-            if (ImGui::MenuItem("Exit", "Ctrl+Q")) 
+            if (ImGui::MenuItem("Exit...", "Ctrl+Q")) 
             {
 
             }
@@ -82,33 +87,64 @@ void EngineMainMenuBar::Render()
         
         if (ImGui::BeginMenu("Edit"))
         {
-            if (ImGui::MenuItem(ICON_FA_UNDO "   Undo", "Ctrl+Z")) 
+            if (ImGui::MenuItem(ICON_FA_ROTATE_LEFT "   Undo", "Ctrl+Z")) 
             { 
-                LOG("Perform menu action - Undo");
+                LOG("Perform menu action - Edit - Undo");
             }
-            if (ImGui::MenuItem(ICON_FA_REDO "   Redo", "Ctrl+Y")) 
+            if (ImGui::MenuItem(ICON_FA_ROTATE_RIGHT "   Redo", "Ctrl+Y")) 
             { 
-                LOG("Perform menu action - Redo");
+                LOG("Perform menu action - Edit - Redo");
             }
             ImGui::Separator();
-            if (ImGui::MenuItem(ICON_FA_CUT "   Cut", "Ctrl+X")) 
+            if (ImGui::MenuItem(ICON_FA_SCISSORS "   Cut", "Ctrl+X")) 
             {
-                LOG("Perform menu action - Cut");
+                LOG("Perform menu action - Edit - Cut");
             }
             if (ImGui::MenuItem(ICON_FA_COPY "   Copy", "Ctrl+C")) 
             {
-                LOG("Perform menu action - Copy");
+                LOG("Perform menu action - Edit - Copy");
 
             }
             if (ImGui::MenuItem(ICON_FA_PASTE "   Paste", "Ctrl+V")) 
             { 
-                LOG("Perform menu action - Paste");
+                LOG("Perform menu action - Edit - Paste");
             }
             ImGui::Separator();
-            if (ImGui::MenuItem(ICON_FA_SEARCH "   Find", "Ctrl+F")) 
+            if (ImGui::MenuItem(ICON_FA_MAGNIFYING_GLASS "   Find", "Ctrl+F")) 
             { 
-                LOG("Perform menu action - Find");
+                LOG("Perform menu action - Edit - Find");
             }
+            ImGui::EndMenu();
+        }
+
+
+        if (ImGui::BeginMenu("View"))
+        {
+            if (ImGui::MenuItem("Toggle Directory View")) 
+            { 
+                LOG("Perform menu action - View - Toggle Directory View");
+                auto dirView = EngineUI::Get()->GetDock<DirectoryViewDock>();
+                dirView->visible = !(dirView->visible);
+            }
+            if (ImGui::MenuItem("Toggle Toolbar")) 
+            { 
+                LOG("Perform menu action - View - Toggle Toolbar");
+            }
+            if (ImGui::MenuItem("Toggle Output Dock")) 
+            { 
+                LOG("Perform menu action - View - Toggle Output Dock");
+            }
+            ImGui::EndMenu();
+        }
+
+         if (ImGui::BeginMenu("Help"))
+        {
+            if (ImGui::MenuItem("About")) 
+            { 
+                LOG("Perform menu action - Help - About");
+     
+            }
+          
             ImGui::EndMenu();
         }
         ImGui::PopStyleColor(2);
@@ -123,23 +159,25 @@ void EngineMainMenuBar::Render()
     CreateNewProjectPopup();
 }
 
+
+void EngineMainMenuBar::OpenFile()
+{
+    LOG("EngineMainMenuBar::OpenFile");
+    std::string path = OpenFileDialog();
+
+    if (!path.empty())
+    {
+        EngineUI::Get()->GetDock<OpenedFilesDock>()->OpenFile(path.c_str());
+    }
+}
 void EngineMainMenuBar::OpenFolder()
 {
-    nfdchar_t *outPath = NULL;
-    nfdresult_t result = NFD_PickFolder(NULL, &outPath);
-        
-    if (result == NFD_OKAY) 
+    LOG("EngineMainMenuBar::OpenFolder");
+    std::string path = OpenFolderDialog();
+
+    if (!path.empty())
     {
-        LOG("Opening folder:", outPath);
-        EngineUI::Get()->GetDock<DirectoryViewDock>()->OpenFolder(outPath);
-    }
-    else if (result == NFD_CANCEL) 
-    {
-        LOG("Open folder dialog canceled");
-    }
-    else 
-    {
-        LOG(NFD_GetError());
+        EngineUI::Get()->GetDock<DirectoryViewDock>()->OpenFolder(path.c_str());
     }
 }
 

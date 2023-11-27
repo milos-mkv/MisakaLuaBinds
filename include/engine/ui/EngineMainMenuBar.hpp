@@ -10,9 +10,11 @@ public:
     void Destroy() override;
 
     EngineMainMenuBar();
-    ~EngineMainMenuBar() {}
+   ~EngineMainMenuBar() {}
 
+    void OpenFile();
     void OpenFolder();
+    
     void CreateNewProjectPopup();
 
     void OnCreateNewProjectConfirm(const std::string& name, const std::string& path, const std::string& type);

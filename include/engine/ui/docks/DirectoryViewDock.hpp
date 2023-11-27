@@ -33,6 +33,7 @@ public:
     void OpenFolder(const char* path);
 
 public:
+    bool visible = false;
     std::string currentFolder;
     std::thread directoryLoaderThread;
 

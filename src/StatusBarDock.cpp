@@ -21,6 +21,7 @@ static bool LuaStateCheckIfOK(lua_State* L, int r)
 
 void StatusBarDock::Render()
 {
+    return;
     ImGui::SetNextWindowPos({ImGui::GetMainViewport()->Pos.x, ImGui::GetMainViewport()->Pos.y + 25});
     ImGui::SetNextWindowSize({ ImGui::GetMainViewport()->Size.x, 25});
     bool a = true;

@@ -2290,8 +2290,6 @@ void TextEditor::ColorizeInternal()
 		auto currentLine = 0;
 		auto currentIndex = 0;
 	
-		std::cout << currentLine << ":" <<endLine << "\n";
-
 		while (currentLine < endLine || currentIndex < endIndex)
 		{
 			auto& line = mLines[currentLine];
@@ -2403,7 +2401,6 @@ void TextEditor::ColorizeInternal()
 
 	if (mColorRangeMin < mColorRangeMax)
 	{
-		std::cout << "OTHER ONE" << std::endl;
 		const int increment = (mLanguageDefinition.mTokenize == nullptr) ? 10 : 10000;
 		const int to = std::min(mColorRangeMin + increment, mColorRangeMax);
 		ColorizeRange(mColorRangeMin, to);

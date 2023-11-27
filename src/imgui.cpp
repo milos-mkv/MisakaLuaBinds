@@ -18134,7 +18134,7 @@ ImGuiID ImGui::DockSpaceOverViewport(const ImGuiViewport* viewport, ImGuiDockNod
     if (viewport == NULL)
         viewport = GetMainViewport();
 
-    SetNextWindowPos({viewport->WorkPos.x, viewport->WorkPos.y + 30});
+    SetNextWindowPos({viewport->WorkPos.x, viewport->WorkPos.y}); //  + 30 MILISAV
     SetNextWindowSize({viewport->WorkSize.x, viewport->WorkSize.y});
     SetNextWindowViewport(viewport->ID);
 

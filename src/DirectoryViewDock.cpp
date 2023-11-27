@@ -62,10 +62,10 @@ void DirectoryViewDock::RecursivelyDisplayDirectoryNode(const std::shared_ptr<Di
 	ImGui::PushID(&parentNode);
 	if (parentNode->IsDirectory)
 	{
-        auto cur = ImGui::GetCursorPos();
-        cur.x += 30;
-        cur.y += 2;
-		if (ImGui::TreeNodeEx(("       " + parentNode->FileName).c_str(), ImGuiTreeNodeFlags_SpanFullWidth))
+        // auto cur = ImGui::GetCursorPos();
+        // cur.x += 30;
+        // cur.y += 2;
+		if (ImGui::TreeNodeEx((" " ICON_FA_FOLDER " " + parentNode->FileName).c_str(), ImGuiTreeNodeFlags_SpanFullWidth))
 		{
             OpenContextMenu(parentNode->FullPath.c_str(), true);
 
@@ -81,11 +81,11 @@ void DirectoryViewDock::RecursivelyDisplayDirectoryNode(const std::shared_ptr<Di
         }
         
 
-        auto cur2 = ImGui::GetCursorPos();
-        cur.y -= 2;
-        ImGui::SetCursorPos(cur);
-        ImGui::Image((ImTextureID) (EngineAssetManager::Get()->textures["Folder Icon"].id), {20, 20}); 
-        ImGui::SetCursorPos(cur2);
+        // auto cur2 = ImGui::GetCursorPos();
+        // cur.y -= 2;
+        // ImGui::SetCursorPos(cur);
+        // ImGui::Image((ImTextureID) (EngineAssetManager::Get()->textures["Folder Icon"].id), {20, 20}); 
+        // ImGui::SetCursorPos(cur2);
 	}
 	else
 	{
@@ -116,10 +116,10 @@ void DirectoryViewDock::RecursivelyDisplayDirectoryNode(const std::shared_ptr<Di
         cur.y += 6;
         ImGui::SetCursorPos(cur);
 
-        ImGui::Image((ImTextureID) (EngineAssetManager::Get()->textures["File Icon"].id), {16, 16}); 
+        // ImGui::Image((ImTextureID) (EngineAssetManager::Get()->textures["File Icon"].id), {16, 16}); 
         ImGui::SameLine();
         ImGui::SetCursorPos(cur2);
-        ImGui::Text(("             "  + parentNode->FileName).c_str());
+        ImGui::Text(("        " ICON_FA_FILE_CODE "  "  + parentNode->FileName).c_str());
 	}
 	ImGui::PopID();
 }
@@ -151,6 +151,9 @@ void DirectoryViewDock::OpenFolder(const char* path)
 
 void DirectoryViewDock::Render()
 {   
+    if (!visible)
+        return;
+        
     ImGuiWindowClass window_class;
     window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoDockingOverMe | ImGuiDockNodeFlags_NoDockingSplit
                                           | ImGuiDockNodeFlags_NoCloseButton | ImGuiDockNodeFlags_NoTabBar
@@ -178,6 +181,7 @@ void DirectoryViewDock::Render()
 
 DirectoryViewDock::~DirectoryViewDock()
 {
+    LOG("DirectoryViewDock::~DirectoryViewDock");
 }
 
 void DirectoryViewDock::OpenContextMenu(const char* path, bool isDirectory)
