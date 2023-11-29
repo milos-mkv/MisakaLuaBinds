@@ -12,14 +12,16 @@
 #include <engine/ui/EngineAssetManager.hpp>
 
 #include <utils/Types.hpp>
+
 class EngineUI
 {
-private: 
+private:
     static inline PTR<EngineUI> s_instance = nullptr;
 
 public:
     static PTR<EngineUI> Get();
-    static void Destroy();
+    
+    void Destroy();
 
     PTR<EngineAssetManager> m_assetManager;
     
@@ -37,9 +39,6 @@ public:
 
 public:
     std::unordered_map<std::type_index, std::shared_ptr<EngineUIDock>> m_uiDocks;
-    std::unordered_map<std::string, std::shared_ptr<CodeEditorDock>> m_codeEditors;
-
-
 };
 
 #endif

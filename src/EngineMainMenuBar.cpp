@@ -1,33 +1,32 @@
 #include <engine/ui/EngineMainMenuBar.hpp>
 
-#include <imgui.h>
-#include <engine/ui/EngineAssetManager.hpp>
-#include <nfd.h>
-#include <utils/Logger.hpp>
-#include <engine/ui/EngineUI.hpp>
-
 #include <engine/ui/docks/DirectoryViewDock.hpp>
 #include <engine/ui/docks/OpenedFilesDock.hpp>
+#include <engine/ui/EngineAssetManager.hpp>
+#include <engine/ui/EngineUI.hpp>
+#include <engine/ui/EngineUIActions.hpp>
+
+#include <imgui.h>
+#include <nfd.h>
 
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_internal.h>
 #include <FontAwesomeIcons.hpp>
-#include <engine/ui/EngineUI.hpp>
-#include <engine/gl/Texture.hpp>
+
 #include <filesystem>
 #include <string>
+
 #include <utils/Logger.hpp>
-#include <engine/ui/EngineUIActions.hpp>
 
 EngineMainMenuBar::EngineMainMenuBar()
 {
-
+    LOG("EngineMainMenuBar::EngineMainMenuBar");
 }
 
 void EngineMainMenuBar::Destroy()
 {
-
+    LOG("EngineMainMenuBar::Destroy");
 }
 
 void EngineMainMenuBar::Render()
@@ -53,6 +52,7 @@ void EngineMainMenuBar::Render()
 
             if (ImGui::MenuItem("New File")) 
             { 
+                NewFile();
             }
             if (ImGui::MenuItem("Open File")) 
             { 
@@ -65,9 +65,11 @@ void EngineMainMenuBar::Render()
             ImGui::Separator();
             if (ImGui::MenuItem("Save File")) 
             { 
+                SaveFile();
             }
             if (ImGui::MenuItem("Save File As")) 
             { 
+                SaveFileAs();
             }
             ImGui::Separator();
             if (ImGui::MenuItem("Close File")) 
@@ -124,7 +126,7 @@ void EngineMainMenuBar::Render()
             { 
                 LOG("Perform menu action - View - Toggle Directory View");
                 auto dirView = EngineUI::Get()->GetDock<DirectoryViewDock>();
-                dirView->visible = !(dirView->visible);
+                dirView->m_visible = !(dirView->m_visible);
             }
             if (ImGui::MenuItem("Toggle Toolbar")) 
             { 
@@ -159,7 +161,6 @@ void EngineMainMenuBar::Render()
     CreateNewProjectPopup();
 }
 
-
 void EngineMainMenuBar::OpenFile()
 {
     LOG("EngineMainMenuBar::OpenFile");
@@ -170,6 +171,45 @@ void EngineMainMenuBar::OpenFile()
         EngineUI::Get()->GetDock<OpenedFilesDock>()->OpenFile(path.c_str());
     }
 }
+
+void EngineMainMenuBar::NewFile()
+{
+    LOG("EngineMainMenuBar::NewFile");
+ 
+    EngineUI::Get()->GetDock<OpenedFilesDock>()->OpenEmptyFile();
+    
+}
+
+void EngineMainMenuBar::SaveFile()
+{
+    LOG("EngineMainMenuBar::SaveFile");
+
+    auto openedFilesDock = EngineUI::Get()->GetDock<OpenedFilesDock>();
+
+    if (openedFilesDock->m_files.size() == 0)
+        return;
+
+    if (openedFilesDock->m_selected.empty())
+        return;
+
+    openedFilesDock->m_files[openedFilesDock->m_selected]->Save();
+}
+
+void EngineMainMenuBar::SaveFileAs()
+{
+    LOG("EngineMainMenuBar::SaveFile");
+
+    auto openedFilesDock = EngineUI::Get()->GetDock<OpenedFilesDock>();
+
+    if (openedFilesDock->m_files.size() == 0)
+        return;
+
+    if (openedFilesDock->m_selected.empty())
+        return;
+
+    openedFilesDock->m_files[openedFilesDock->m_selected]->SaveAs();
+}
+
 void EngineMainMenuBar::OpenFolder()
 {
     LOG("EngineMainMenuBar::OpenFolder");
@@ -319,5 +359,5 @@ void EngineMainMenuBar::OnCreateNewProjectConfirm(const std::string& name, const
     ofs = std::ofstream(path + "/" + name + "/project.json");
     ofs.close();
     
-    EngineUI::Get()->GetDock<DirectoryViewDock>()->OpenFolder((path + "/" + name).c_str());
+    EngineUI::Get()->GetDock<DirectoryViewDock>()->OpenFolder(path + "/" + name);
 }

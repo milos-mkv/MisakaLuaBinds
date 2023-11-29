@@ -50,3 +50,27 @@ std::string OpenFolderDialog()
         return "";
     }
 }
+
+std::string SaveFileDialog()
+{
+    LOG("SaveFileDialog - Action");
+
+    nfdchar_t *outPath = NULL;
+    nfdresult_t result = NFD_SaveDialog(NULL, NULL, &outPath);
+    
+    if (result == NFD_OKAY)
+    {
+        LOG("Folder found:", outPath);
+        return outPath;
+    }
+    else if (result == NFD_CANCEL) 
+    {
+        LOG("Open folder dialog canceled");
+        return "";
+    }
+    else 
+    {
+        LOG(NFD_GetError());
+        return "";
+    }
+}

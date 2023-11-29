@@ -1,33 +1,32 @@
 #ifndef MISAKA_ENGINE_OPENED_FILES_DOCK
 #define MISAKA_ENGINE_OPENED_FILES_DOCK
 
-#include "../EngineUIDock.hpp"
-#include <utils/Logger.hpp>
+#include <engine/ui/EngineUIDock.hpp>
+#include <engine/ui/widgets/CodeEditorWidget.hpp>
 #include <unordered_map>
-#include <engine/gl/Texture.hpp>
-#include <engine/ui/docks/CodeEditorDock.hpp>
-#include <vector>
-#include <filesystem>
-#include <fstream>
-#include <atomic>
-#include <thread>
+#include <string>
 #include <utils/Types.hpp>
+#include <imgui.h>
+#include <stack>
 
 class OpenedFilesDock : public EngineUIDock
 {
 public:
-    std::unordered_map<std::string, PTR<CodeEditorDock>> m_files;
+    std::unordered_map<std::string, PTR<CodeEditorWidget>> m_files;
+    std::string m_selected;
+    ImGuiWindowClass m_windowClass; 
+    ImGuiTabBarFlags m_tabBarFlags;
+    std::stack<std::string> m_tabsToRemove;
 
 public:
-
-    virtual void Render() override;
-    virtual void Destroy() override;
-
     OpenedFilesDock();
    ~OpenedFilesDock();
 
-   void OpenFile(const std::string& path, std::string fileName = "", std::string ext = "");
+    virtual void Render()  override;
+    virtual void Destroy() override;
 
+    void OpenFile(const std::string& path, std::string fileName = "", std::string ext = "");
+    void OpenEmptyFile();
 };
 
 #endif

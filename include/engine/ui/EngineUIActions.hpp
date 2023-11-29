@@ -6,4 +6,6 @@
 std::string OpenFileDialog();
 std::string OpenFolderDialog();
 
+std::string SaveFileDialog();
+
 #endif

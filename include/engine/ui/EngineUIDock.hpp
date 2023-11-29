@@ -3,10 +3,10 @@
 
 #include <engine/components/RenderableComponent.hpp>
 
-class EngineUIDock : public RenderableComponent
+class EngineUIDock
 {
 public:
-    virtual void Render() override { /* To override in child class. */ } 
+    virtual void Render()  = 0;
     virtual void Destroy() = 0;
 };
 

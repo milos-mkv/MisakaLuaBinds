@@ -22,21 +22,21 @@ static bool LuaStateCheckIfOK(lua_State* L, int r)
 void StatusBarDock::Render()
 {
     return;
-    ImGui::SetNextWindowPos({ImGui::GetMainViewport()->Pos.x, ImGui::GetMainViewport()->Pos.y + 25});
-    ImGui::SetNextWindowSize({ ImGui::GetMainViewport()->Size.x, 25});
-    bool a = true;
-    ImGui::Begin("Status Bar", &a, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |ImGuiWindowFlags_NoScrollbar);
-    if(ImGui::Button("RUN"))
-    {
-        auto file =EngineUI::Get()->GetDock<DirectoryViewDock>()->currentFolder + "/main.lua";
-        lua_State* state = luaL_newstate();
-        luaL_openlibs(state);
-        if(LuaStateCheckIfOK(state, luaL_dofile(state, file.c_str())))
-        {
+    // ImGui::SetNextWindowPos({ImGui::GetMainViewport()->Pos.x, ImGui::GetMainViewport()->Pos.y + 25});
+    // ImGui::SetNextWindowSize({ ImGui::GetMainViewport()->Size.x, 25});
+    // bool a = true;
+    // ImGui::Begin("Status Bar", &a, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |ImGuiWindowFlags_NoScrollbar);
+    // if(ImGui::Button("RUN"))
+    // {
+    //     auto file =EngineUI::Get()->GetDock<DirectoryViewDock>()->currentFolder + "/main.lua";
+    //     lua_State* state = luaL_newstate();
+    //     luaL_openlibs(state);
+    //     if(LuaStateCheckIfOK(state, luaL_dofile(state, file.c_str())))
+    //     {
 
-        }
-    }
-    ImGui::End();
+    //     }
+    // }
+    // ImGui::End();
 }
 
 void StatusBarDock::Destroy()

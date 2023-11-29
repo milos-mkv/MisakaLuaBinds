@@ -14,9 +14,13 @@ public:
     std::string ext;
     bool alive = true;
     TextEditor* editor;
+
+    ImGuiTabItemFlags flags = ImGuiTabItemFlags_None;
+
+
     CodeEditorDock(const std::string& path, const std::string& fileName = "", const std::string& ext = "");
     void Render() override;
-    void Destroy() override { }
+    void Destroy() override { if(editor != nullptr) delete editor; }
 
 };
 

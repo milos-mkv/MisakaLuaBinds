@@ -12,9 +12,12 @@ public:
     EngineMainMenuBar();
    ~EngineMainMenuBar() {}
 
+    void NewFile();
     void OpenFile();
     void OpenFolder();
-    
+    void SaveFile();
+    void SaveFileAs();
+
     void CreateNewProjectPopup();
 
     void OnCreateNewProjectConfirm(const std::string& name, const std::string& path, const std::string& type);

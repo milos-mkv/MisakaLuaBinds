@@ -1,4 +1,0 @@
-#ifndef MISAKA_LUA_BINDS_UTILS
-#define MISAKA_LUA_BINDS_UTILS
-
-#endif

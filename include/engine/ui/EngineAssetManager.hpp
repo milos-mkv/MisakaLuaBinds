@@ -14,10 +14,12 @@ private:
 
 public:
     static std::shared_ptr<EngineAssetManager> Get();
-     void Destroy();
+    
+    void Destroy();
 
     EngineAssetManager();
    ~EngineAssetManager();
+   
     std::unordered_map<std::string, Texture> textures;
     std::unordered_map<std::string, ImFont*> fonts;
 };

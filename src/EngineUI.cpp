@@ -29,7 +29,7 @@ EngineUI::EngineUI()
     m_uiDocks[typeid(EngineMainMenuBar)] = CreatePTR(EngineMainMenuBar);
     m_uiDocks[typeid(DirectoryViewDock)] = CreatePTR(DirectoryViewDock);
     m_uiDocks[typeid(OpenedFilesDock  )] = CreatePTR(OpenedFilesDock  );
-    m_uiDocks[typeid(StatusBarDock    )] = CreatePTR(StatusBarDock    );
+    // m_uiDocks[typeid(StatusBarDock    )] = CreatePTR(StatusBarDock    );
 }
 
 
@@ -46,30 +46,12 @@ void EngineUI::Render()
     }
 }
 
-void EngineUI::OpenFile(const std::string& path, const std::string& fileName, const std::string& ext)
-{
-    LOG(path);
-    std::unordered_map<std::string, std::shared_ptr<CodeEditorDock>>::iterator i = m_codeEditors.find(path);
-    if (i == m_codeEditors.end())
-    {
-        m_codeEditors[path] = std::make_shared<CodeEditorDock>(path, fileName, ext);
-    }
-    else
-    {
-        m_codeEditors[path]->alive = true;
-        // ImGui::SetWindowFocus(path.c_str());
-        LOG(path, "already opened!");
-    }
-}
-
 void EngineUI::Destroy()
 {
-
     LOG("EngineUI::Destroy");
     for(const auto& [key, value] : s_instance->m_uiDocks)
     {
         value->Destroy();
     }
-    EngineAssetManager::Get()->Destroy();
-
+    m_assetManager->Destroy();
 }
