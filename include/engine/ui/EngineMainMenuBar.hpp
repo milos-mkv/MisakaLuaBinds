@@ -3,6 +3,7 @@
 
 #include <engine/ui/EngineUIDock.hpp>
 #include <string>
+
 class EngineMainMenuBar : public EngineUIDock
 {
 public:

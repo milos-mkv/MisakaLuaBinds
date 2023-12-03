@@ -1,20 +1,18 @@
 #ifndef MISAKA_ENGINE
 #define MISAKA_ENGINE
 
-#include <memory>
 #include <GLFW/glfw3.h>
-#include "ui/EngineUI.hpp"
-
+#include <engine/ui/EngineUI.hpp>
+#include <utils/Types.hpp>
 class Engine
 {
 private:
-    static inline std::shared_ptr<Engine> s_instance = nullptr;
+    static inline PTR<Engine> s_instance = nullptr;
 
 public:
-    static inline ImGuiID DID;
-    GLFWwindow* m_window;
+    static PTR<Engine> Get();
 
-    static std::shared_ptr<Engine> Get();
+    GLFWwindow* m_window;
 
     Engine();
    ~Engine();

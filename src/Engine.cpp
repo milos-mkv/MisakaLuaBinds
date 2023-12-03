@@ -1,65 +1,40 @@
 #include <engine/Engine.hpp>
-#include <engine/gl/Texture.hpp>
-#include <engine/ui/EngineUI.hpp>
 
-#pragma region ========================== INCLUDE ==========================
+#include <utils/Logger.hpp>
+#include <OpenGL/gl3.h>
 
-    #include <utils/Logger.hpp>
-    #include <GLFW/glfw3.h>
-    #include <OpenGL/gl3.h>
-    // #include <stb_image.h>
-    #include <imgui.h>
-    #include <imgui_impl_glfw.h>
-    #include <imgui_impl_opengl3.h>
-    #include <imgui_internal.h>
-    #include <TextEditor.h>
-    #include <fstream>
-    #include <filesystem>
-    #include <FontAwesomeIcons.hpp>
-    #include <engine/ui/EngineUI.hpp>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_internal.h>
 
-#pragma endregion
+#include <FontAwesomeIcons.hpp>
 
-std::shared_ptr<Engine> Engine::Get()
+PTR<Engine> Engine::Get()
 {
     if (s_instance == nullptr)
-        s_instance = std::make_shared<Engine>();
+        s_instance = CreatePTR(Engine);
     return s_instance;
 }
 
 Engine::Engine()
 {
-    LOG("Engine initialize!");
+    LOG("Engine::Engine");
     InitializeGLFW();
     InitializeImGui();
 }
 
-
-
 void Engine::Run()
 {
-    TextEditor editor;
-    auto lang = TextEditor::LanguageDefinition::Lua();
-	editor.SetLanguageDefinition(lang);
+    LOG("Engine::Run");
 
-	static const char* fileToEdit = "../scripts/script.lua";
-    {
-		std::ifstream t(fileToEdit);
-		if (t.good())
-		{
-			std::string str((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
-			editor.SetText(str);
-		}
-	}
-
-    auto a = EngineUI::Get();
+    EngineUI::Get();
 
     while (!glfwWindowShouldClose(m_window))
     {
         glfwPollEvents();
         
-        // Clear default framebuffer.
-        glClearColor(0, 0, 0, 0);
+        glClearColor(0.0941,0.0941,0.0941, 1.00f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         RenderImGui();
@@ -74,24 +49,17 @@ void Engine::RenderImGui()
     ImGui_ImplGlfw_NewFrame();  
     ImGui::NewFrame();
     ImGui::SetNextWindowPos({-1, 100});
-    DID = ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
-    // Add UI;
-    EngineUI::Get()->Render();
+    ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
 
+    EngineUI::Get()->Render();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    GLFWwindow* backup_current_context = glfwGetCurrentContext();
-    ImGui::UpdatePlatformWindows();
-    ImGui::RenderPlatformWindowsDefault();
-    glfwMakeContextCurrent(backup_current_context);
-    // LOG(ImGui::GetIO().Framerate);
 }
 
 Engine::~Engine()
 {
-    LOG("Engine destroy!");
+    LOG("Engine::~Engine");
     EngineUI::Get()->Destroy();
 
     ImGui_ImplOpenGL3_Shutdown();
@@ -102,7 +70,6 @@ Engine::~Engine()
     glfwTerminate();
 }
 
-#pragma region ===================== Initialize Engine =====================
 
 void Engine::InitializeGLFW()
 {
@@ -132,7 +99,7 @@ void Engine::InitializeGLFW()
         LOG("GLFW Frame buffer size callback:", width, height);
         glViewport(0, 0, width, height);
     });
-    // glfwSwapInterval(1);
+    glfwSwapInterval(2);
 }
 
 void Engine::InitializeImGui()
@@ -141,14 +108,12 @@ void Engine::InitializeImGui()
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-    // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; 
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;// | ImGuiConfigFlags_ViewportsEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
     ImGui_ImplOpenGL3_Init("#version 150");
 
     SetStyleForImGui();
-
 }
 
 void Engine::SetStyleForImGui()
@@ -160,7 +125,7 @@ void Engine::SetStyleForImGui()
     style.Colors[ImGuiCol_TextDisabled]          = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
     style.Colors[ImGuiCol_WindowBg]              = bgColor;
     style.Colors[ImGuiCol_ChildBg]               = ImVec4(0.13f, 0.14f, 0.15f, 1.00f);
-    style.Colors[ImGuiCol_PopupBg]               = bgColor;//ImVec4(0.13f, 0.14f, 0.15f, 1.00f);
+    style.Colors[ImGuiCol_PopupBg]               = bgColor;
     style.Colors[ImGuiCol_Border]                = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
     style.Colors[ImGuiCol_BorderShadow]          = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
     style.Colors[ImGuiCol_FrameBg]               = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
@@ -210,5 +175,3 @@ void Engine::SetStyleForImGui()
     // style.WindowMenuButtonPosition               = ImGuiDir_None;
     style.TabRounding = 0;
 }
-
-#pragma endregion

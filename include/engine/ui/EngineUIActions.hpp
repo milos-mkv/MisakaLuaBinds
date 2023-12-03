@@ -3,9 +3,8 @@
 
 #include <string>
 
-std::string OpenFileDialog();
-std::string OpenFolderDialog();
-
-std::string SaveFileDialog();
+std::string EngineOpenFileDialog();
+std::string EngineOpenFolderDialog();
+std::string EngineSaveFileDialog();
 
 #endif

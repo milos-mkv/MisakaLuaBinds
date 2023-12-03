@@ -4,7 +4,7 @@
 #include <engine/ui/EngineUIDock.hpp>
 #include <string>
 #include <memory>
-#include <TextEditor.h>
+#include <texteditor/TextEditor.h>
 
 class CodeEditorDock : public EngineUIDock
 {

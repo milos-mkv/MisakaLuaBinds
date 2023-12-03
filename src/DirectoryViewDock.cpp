@@ -19,108 +19,65 @@
 
 #include <utils/Logger.hpp>
 
-void DirectoryViewDock::RecursivelyAddDirectoryNodes(const PTR<DirectoryNode>& parentNode, std::filesystem::directory_iterator directoryIterator)
-{
-	for (const std::filesystem::directory_entry& entry : directoryIterator)
-	{
-		PTR<DirectoryNode> childNode = CreatePTR(DirectoryNode);
-		childNode->FullPath  = entry.path().c_str();
-		childNode->FileName  = entry.path().filename().c_str();
-        childNode->Extension = entry.path().extension().c_str();
-
-        parentNode->Children.push_back(childNode);
-		if (childNode->IsDirectory = entry.is_directory(); childNode->IsDirectory)
-			RecursivelyAddDirectoryNodes(childNode, std::filesystem::directory_iterator(entry));
-	}
-    
-    std::sort(parentNode->Children.begin(), parentNode->Children.end(),[](const PTR<DirectoryNode>& d1, const PTR<DirectoryNode>& d2){
-        return d1->FileName[0] < d2->FileName[0];
-    });
-
-	auto moveDirectoriesToFront = [](const PTR<DirectoryNode>& a, const PTR<DirectoryNode>& b) { return (a->IsDirectory > b->IsDirectory); };
-	std::sort(parentNode->Children.begin(), parentNode->Children.end(), moveDirectoriesToFront);
-}
-
-PTR<DirectoryNode> DirectoryViewDock::CreateDirectryNodeTreeFromPath(const std::filesystem::path& rootPath)
-{
-	PTR<DirectoryNode> rootNode = CreatePTR(DirectoryNode);
-	rootNode->FullPath  = rootPath.c_str();
-	rootNode->FileName  = rootPath.filename().c_str();
-    rootNode->Extension = rootPath.extension().c_str();
-
-	if (rootNode->IsDirectory = std::filesystem::is_directory(rootPath); rootNode->IsDirectory)
-    {
-        if(m_directoryLoaderThread.joinable())
-        {    
-            m_directoryLoaderThread.join();
-        }
-		m_directoryLoaderThread = std::thread(&DirectoryViewDock::RecursivelyAddDirectoryNodes, this, rootNode, std::filesystem::directory_iterator(rootPath));
-    }
-	return rootNode;
-}
-
 void DirectoryViewDock::RecursivelyDisplayDirectoryNode(const PTR<DirectoryNode>& parentNode)
 {
 	ImGui::PushID(&parentNode);
-	if (parentNode->IsDirectory)
+	if (parentNode->m_isDirectory)
 	{
-		if (ImGui::TreeNodeEx((" " ICON_FA_FOLDER " " + parentNode->FileName).c_str(), ImGuiTreeNodeFlags_SpanFullWidth))
+		if (ImGui::TreeNodeEx((" " ICON_FA_FOLDER " " + parentNode->Name()).c_str(), ImGuiTreeNodeFlags_SpanFullWidth))
 		{
-            OpenContextMenu(parentNode->FullPath.c_str(), true);
+            OpenContextMenu(parentNode, true);
 
-			for (const auto& childNode : parentNode->Children)
+			for (const auto& childNode : parentNode->m_children)
 			{	
                 RecursivelyDisplayDirectoryNode(childNode);
             }
 			ImGui::TreePop();
 		}
-        else
-        {
-            OpenContextMenu(parentNode->FullPath.c_str(), true);
+        else 
+        { 
+            OpenContextMenu(parentNode, true); 
         }
 	}
 	else
 	{
-        auto cur = ImGui::GetCursorPos();
-        auto cur2 = cur;    
+        auto startCursor = ImGui::GetCursorPos();
+
         ImGui::SetCursorPosX(0);
-        if (m_selectedFile == parentNode->FullPath)
-        {
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.25f, 0.25f, 0.25f, 1.00f));
-        }
-        else
-        {
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-        }
+
+        ImGui::PushStyleColor(ImGuiCol_Button, (m_selectedFile == parentNode->Path()) ? ImVec4(0.25f, 0.25f, 0.25f, 1.00f) : ImVec4(0, 0, 0, 0));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.25f, 0.25f, 0.25f, 1.00f));
-        if (ImGui::Button(("###  " + parentNode->FileName).c_str(), ImVec2(-1, 25)))
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
+
+        if (ImGui::Button(("###  " + parentNode->Name()).c_str(), ImVec2(-1, 23)))
         {
-            LOG("File selected:", parentNode->FullPath);
-            m_selectedFile = parentNode->FullPath;
-            EngineUI::Get()->GetDock<OpenedFilesDock>()->OpenFile(parentNode->FullPath, parentNode->FileName, parentNode->Extension);
+            LOG("File selected:", parentNode->Path());
+            m_selectedFile = parentNode->Path();
+
+            // TODO: Change params.
+            EngineUI::Get()->GetDock<OpenedFilesDock>()->OpenFile(parentNode->Path(), parentNode->Name(), parentNode->Extn());
         }
-        OpenContextMenu(parentNode->FullPath.c_str(), false);
+
+        ImGui::PopStyleVar();
         ImGui::PopStyleColor(2);
-        ImGui::SameLine();
 
-        cur.x += 32;
-        cur.y += 6;
-        ImGui::SetCursorPos(cur);
+        OpenContextMenu(parentNode, false);
 
         ImGui::SameLine();
-        ImGui::SetCursorPos(cur2);
-        ImGui::Text(("        " ICON_FA_FILE_CODE "  "  + parentNode->FileName).c_str());
+        ImGui::SetCursorPos(startCursor);
+        ImGui::Text(("        " ICON_FA_FILE_CODE "  "  + parentNode->Name()).c_str());
 	}
 	ImGui::PopID();
 }
 
-DirectoryViewDock::DirectoryViewDock()
+DirectoryViewDock::DirectoryViewDock() 
+    : m_visible(true), m_removeFile(nullptr)
 {
     LOG("DirectoryViewDock::DirectoryViewDock");
 
      m_windowClass.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoDockingOverMe 
                                             | ImGuiDockNodeFlags_NoDockingSplit
-                                            | ImGuiDockNodeFlags_NoCloseButton 
+                                            | ImGuiDockNodeFlags_NoCloseButton
                                             | ImGuiDockNodeFlags_NoTabBar;
     OpenFolder("..");
 }
@@ -128,17 +85,15 @@ DirectoryViewDock::DirectoryViewDock()
 void DirectoryViewDock::Destroy()
 {
     LOG("DirectoryViewDock::Destroy");
-    if (m_directoryLoaderThread.joinable())
-    {
-        m_directoryLoaderThread.join();
-    }
+    if (m_rootNode->m_thread.joinable()) { m_rootNode->m_thread.join(); }
 }
 
 void DirectoryViewDock::OpenFolder(const std::string& path)
 {
     LOG("DirectoryViewDock::OpenFolder", path);
+
     m_currentFolder = path;
-    m_rootNode = CreateDirectryNodeTreeFromPath(std::filesystem::path(path));
+    m_rootNode      = DirectoryNode::CreateDirectryNodeTreeFromPathAsync(path);
 }
 
 void DirectoryViewDock::Render()
@@ -150,24 +105,52 @@ void DirectoryViewDock::Render()
         
     ImGui::SetNextWindowClass(&m_windowClass);
 
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 });
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 1, 1 });
+    ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5);
+    ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 0.5);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
+
     ImGui::PushStyleColor(ImGuiCol_Text, { 0.5f, 0.5f, 0.5f, 1.0f });
+    ImGui::PushStyleColor(ImGuiCol_Border, { 0.3, 0.3, 0.3, 1});
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, { 0.0641, 0.0641, 0.0641, 1.00f });
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, { 0.0641, 0.0641, 0.0641, 1.00f });
 
     ImGui::Begin("Directory View");
-
-    ImGui::PushFont(EngineAssetManager::Get()->fonts["JetBrains"]);
-    ImGui::Text(" FOLDERS");
-    ImGui::PopFont();
-
-    if (!m_currentFolder.empty())
     {
-        RecursivelyDisplayDirectoryNode(m_rootNode);
-    }
+        ImGui::BeginChild("##DirectoryViewChild", {-1, -1}, true);
+        {
+            ImGui::PushFont(EngineAssetManager::Get()->m_fonts["JetBrains"]);
+            ImGui::SetCursorPos({ 10, 6 });
+            ImGui::Text("FOLDERS");
+            ImGui::PopFont();
 
+            if (m_rootNode && !m_currentFolder.empty())
+            {
+                RecursivelyDisplayDirectoryNode(m_rootNode);
+
+                if (m_removeFile)
+                {
+                    if (m_removeFile == m_rootNode)
+                    {
+                        m_rootNode = nullptr;
+
+                    }
+                    else
+                    {
+                        auto it = std::find(m_removeFile->m_parent->m_children.begin(), m_removeFile->m_parent->m_children.end(), m_removeFile);
+                        m_removeFile->m_parent->m_children.erase(it);
+                    }
+                    m_removeFile = nullptr;
+                }
+
+            }
+        }
+        ImGui::EndChild();
+    }
     ImGui::End();
 
-    ImGui::PopStyleColor();
-    ImGui::PopStyleVar();
+    ImGui::PopStyleColor(4);
+    ImGui::PopStyleVar(4);
 }
 
 DirectoryViewDock::~DirectoryViewDock()
@@ -175,13 +158,14 @@ DirectoryViewDock::~DirectoryViewDock()
     LOG("DirectoryViewDock::~DirectoryViewDock");
 }
 
-void DirectoryViewDock::OpenContextMenu(const std::string& path, bool isDirectory)
+void DirectoryViewDock::OpenContextMenu(const PTR<DirectoryNode>& path, bool isDirectory)
 {
     ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, { 0.1, 0.5 });
-    ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 10);
+    ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 5);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 10, 10 });
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-    ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(0.1450980392156863,0.1607843137254902,0.2, 1));
+
+    ImGui::PushStyleColor(ImGuiCol_Button, { 0, 0, 0, 0 });
+    ImGui::PushStyleColor(ImGuiCol_PopupBg, { 0.0641, 0.0641, 0.0641, 1 });
 
     if (ImGui::BeginPopupContextItem())
     { 
@@ -196,23 +180,35 @@ void DirectoryViewDock::OpenContextMenu(const std::string& path, bool isDirector
         ImGui::EndPopup();
     }
 
-    ImGui::PopStyleVar(3);
     ImGui::PopStyleColor(2);
+    ImGui::PopStyleVar(3);
 }
 
-void DirectoryViewDock::OpenFileContextMenu(const std::string& path)
+void DirectoryViewDock::OpenFileContextMenu(const PTR<DirectoryNode>& path)
 {    
+
+
     if(ImGui::Button("Rename...", { 150, 25 }))
     {
-
     }
+
     if(ImGui::Button("Delete file", { 150, 25 }))
     {
+        if (std::filesystem::remove(path->Path()))
+        {
+            LOG("File deleted:", path->Path());
+            m_removeFile = path;
+        }
+        else
+        {
+            LOG("Failed to delete file:", path->Path());
+        }
 
+        ImGui::CloseCurrentPopup();
     }
 }
 
-void DirectoryViewDock::OpenFolderContextMenu(const std::string& path)
+void DirectoryViewDock::OpenFolderContextMenu(const PTR<DirectoryNode>& path)
 {
     if(ImGui::Button("New File", { 150, 25})) 
     {
@@ -229,6 +225,15 @@ void DirectoryViewDock::OpenFolderContextMenu(const std::string& path)
     }
     if(ImGui::Button("Delete Folder", { 150, 25}))
     {
-
+        if (std::filesystem::remove_all(path->Path()))
+        {
+            LOG("Folder deleted:", path->Path());
+            m_removeFile = path;
+        }
+        else
+        {
+            LOG("Failed to delete Folder:", path->Path());
+        }
+        ImGui::CloseCurrentPopup();
     }
 }

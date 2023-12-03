@@ -4,7 +4,6 @@
 #include <engine/ui/EngineUIDock.hpp>
 #include <string>
 #include <memory>
-#include <TextEditor.h>
 
 class StatusBarDock : public EngineUIDock
 {

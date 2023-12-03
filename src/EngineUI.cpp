@@ -8,10 +8,8 @@
 #include <engine/ui/docks/OutputDock.hpp>
 
 #include <engine/ui/EngineMainMenuBar.hpp>
+
 #include <utils/Logger.hpp>
-#include <imgui.h>
-#include <imgui_internal.h>
-#include <memory>
 
 PTR<EngineUI> EngineUI::Get()
 {
@@ -24,18 +22,19 @@ EngineUI::EngineUI()
 {
     LOG("EngineUI::EngineUI");
 
-    m_assetManager = EngineAssetManager::Get(); // Load all assets.
+    m_assetManager = EngineAssetManager::Get();
 
     m_uiDocks[typeid(EngineMainMenuBar)] = CreatePTR(EngineMainMenuBar);
     m_uiDocks[typeid(DirectoryViewDock)] = CreatePTR(DirectoryViewDock);
-    m_uiDocks[typeid(OpenedFilesDock  )] = CreatePTR(OpenedFilesDock  );
-    // m_uiDocks[typeid(StatusBarDock    )] = CreatePTR(StatusBarDock    );
+    m_uiDocks[typeid(OpenedFilesDock)]   = CreatePTR(OpenedFilesDock);
+    m_uiDocks[typeid(StatusBarDock)]     = CreatePTR(StatusBarDock);
+    m_uiDocks[typeid(OutputDock)]     = CreatePTR(OutputDock);
 }
 
 
 EngineUI::~EngineUI()
 {
-    LOG("EngineUI::~EngineUI"); // NOTE: Use Destroy function to destruct object.
+    LOG("EngineUI::~EngineUI");
 }
 
 void EngineUI::Render()
@@ -49,6 +48,7 @@ void EngineUI::Render()
 void EngineUI::Destroy()
 {
     LOG("EngineUI::Destroy");
+
     for(const auto& [key, value] : s_instance->m_uiDocks)
     {
         value->Destroy();

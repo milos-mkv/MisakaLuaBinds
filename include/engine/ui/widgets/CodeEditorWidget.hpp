@@ -2,7 +2,7 @@
 #define MISAKA_ENGINE_CODE_EDITOR_WIDGET
 
 #include <string>
-#include <TextEditor.h>
+#include <texteditor/TextEditor.h>
 #include <utils/Types.hpp>
 #include <imgui.h>
 

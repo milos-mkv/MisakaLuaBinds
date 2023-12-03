@@ -57,7 +57,7 @@ void CodeEditorDock::Render()
     // ImGui::SetNextWindowClass(&window_class);
         ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImGui::ColorConvertU32ToFloat4(4279242768));
 
-    ImGui::PushFont(EngineAssetManager::Get()->fonts["JetBrains"]);
+    ImGui::PushFont(EngineAssetManager::Get()->m_fonts["JetBrains"]);
     // ImGui::Begin(path.c_str(), &alive, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_UnsavedDocument);
     editor->Render(path.c_str());
 

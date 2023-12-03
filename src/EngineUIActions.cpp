@@ -3,9 +3,9 @@
 #include <nfd/nfd_common.h>
 #include <utils/Logger.hpp>
 
-std::string OpenFileDialog()
+std::string EngineOpenFileDialog()
 {
-    LOG("OpenFileDialog - Action");
+    LOG("EngineOpenFileDialog - Action");
 
     nfdchar_t *outPath = NULL;
     nfdresult_t result = NFD_OpenDialog(NULL, NULL, &outPath);
@@ -27,9 +27,9 @@ std::string OpenFileDialog()
     }
 }
 
-std::string OpenFolderDialog()
+std::string EngineOpenFolderDialog()
 {
-    LOG("OpenFolderDialogOpening - Action");
+    LOG("EngineOpenFolderDialog - Action");
 
     nfdchar_t *outPath = NULL;
     nfdresult_t result = NFD_PickFolder(NULL, &outPath);
@@ -51,9 +51,9 @@ std::string OpenFolderDialog()
     }
 }
 
-std::string SaveFileDialog()
+std::string EngineSaveFileDialog()
 {
-    LOG("SaveFileDialog - Action");
+    LOG("EngineSaveFileDialog - Action");
 
     nfdchar_t *outPath = NULL;
     nfdresult_t result = NFD_SaveDialog(NULL, NULL, &outPath);

@@ -9602,7 +9602,7 @@ void ImGui::UpdateMouseWheel()
             if (do_scroll[ImGuiAxis_X])
             {
                 LockWheelingWindow(window, wheel.x);
-                float max_step = window->InnerRect.GetWidth() * 0.67f;
+                float max_step = window->InnerRect.GetWidth() * 0.05f;
                 float scroll_step = ImTrunc(ImMin(2 * window->CalcFontSize(), max_step));
                 SetScrollX(window, window->Scroll.x - wheel.x * scroll_step);
                 g.WheelingWindowScrolledFrame = g.FrameCount;
@@ -9610,7 +9610,7 @@ void ImGui::UpdateMouseWheel()
             if (do_scroll[ImGuiAxis_Y])
             {
                 LockWheelingWindow(window, wheel.y);
-                float max_step = window->InnerRect.GetHeight() * 0.67f;
+                float max_step = window->InnerRect.GetHeight() * 0.05f;
                 float scroll_step = ImTrunc(ImMin(5 * window->CalcFontSize(), max_step));
                 SetScrollY(window, window->Scroll.y - wheel.y * scroll_step);
                 g.WheelingWindowScrolledFrame = g.FrameCount;
@@ -18134,8 +18134,8 @@ ImGuiID ImGui::DockSpaceOverViewport(const ImGuiViewport* viewport, ImGuiDockNod
     if (viewport == NULL)
         viewport = GetMainViewport();
 
-    SetNextWindowPos({viewport->WorkPos.x, viewport->WorkPos.y}); //  + 30 MILISAV
-    SetNextWindowSize({viewport->WorkSize.x, viewport->WorkSize.y});
+    SetNextWindowPos({viewport->WorkPos.x + 5, viewport->WorkPos.y + 5}); //  + 30 MILISAV
+    SetNextWindowSize({viewport->WorkSize.x - 10, viewport->WorkSize.y - 10});
     SetNextWindowViewport(viewport->ID);
 
     ImGuiWindowFlags host_window_flags = 0;

@@ -7,8 +7,8 @@
 #include <engine/ui/EngineUIActions.hpp>
 
 #include <imgui.h>
-#include <nfd.h>
-
+#include <nfd/include/nfd.h>
+#include <GLFW/glfw3.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_internal.h>
@@ -36,11 +36,11 @@ void EngineMainMenuBar::Render()
     if (ImGui::BeginMainMenuBar())
     {
         ImGui::PushStyleColor(ImGuiCol_Border, { 0.3, 0.3, 0.3, 1 });
+        ImGui::PushStyleColor(ImGuiCol_Text, { 0.8, 0.8, 0.8, 1.0});
         ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 5);
         ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 15);
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 15);
-        ImGui::PushStyleColor(ImGuiCol_Text, { 0.8, 0.8, 0.8, 1.0});
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 15, 5});
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 15, 5 });
 
         if (ImGui::BeginMenu("File"))
         {
@@ -49,7 +49,6 @@ void EngineMainMenuBar::Render()
                 openCreateNewProjectPopup = true;
             }
             ImGui::Separator();
-
             if (ImGui::MenuItem("New File")) 
             { 
                 NewFile();
@@ -78,11 +77,10 @@ void EngineMainMenuBar::Render()
             if (ImGui::MenuItem("Close All Files")) 
             { 
             }
-          
             ImGui::Separator();
             if (ImGui::MenuItem("Exit...", "Ctrl+Q")) 
             {
-
+                glfwSetWindowShouldClose(glfwGetCurrentContext(), true);
             }
             ImGui::EndMenu();
         }
@@ -118,7 +116,6 @@ void EngineMainMenuBar::Render()
             }
             ImGui::EndMenu();
         }
-
 
         if (ImGui::BeginMenu("View"))
         {
@@ -164,7 +161,7 @@ void EngineMainMenuBar::Render()
 void EngineMainMenuBar::OpenFile()
 {
     LOG("EngineMainMenuBar::OpenFile");
-    std::string path = OpenFileDialog();
+    std::string path = EngineOpenFileDialog();
 
     if (!path.empty())
     {
@@ -213,7 +210,7 @@ void EngineMainMenuBar::SaveFileAs()
 void EngineMainMenuBar::OpenFolder()
 {
     LOG("EngineMainMenuBar::OpenFolder");
-    std::string path = OpenFolderDialog();
+    std::string path = EngineOpenFolderDialog();
 
     if (!path.empty())
     {
@@ -252,7 +249,7 @@ void EngineMainMenuBar::CreateNewProjectPopup()
         ImGui::GetMainViewport()->WorkSize.y / 2 - 300 / 2
     });
     ImGui::SetNextWindowSize({ 500, 300 });
-    ImGui::PushFont(EngineAssetManager::Get()->fonts["JetBrains"]);
+    ImGui::PushFont(EngineAssetManager::Get()->m_fonts["JetBrains"]);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10);
     ImGui::PushStyleColor(ImGuiCol_Border, { 0.51, 0.51, 0.51, 1});
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
@@ -264,7 +261,7 @@ void EngineMainMenuBar::CreateNewProjectPopup()
         auto cursave = ImGui::GetCursorPos();
 
         ImGui::SetCursorPos({-5, 0});
-        ImGui::Image((ImTextureID) EngineAssetManager::Get()->textures["Project"].id, { 300, 300}, { 0, 0}, {1, 1}, {1, 1, 1, 0.5f});
+        ImGui::Image((ImTextureID) EngineAssetManager::Get()->m_textures["Project"].id, { 300, 300}, { 0, 0}, {1, 1}, {1, 1, 1, 0.5f});
         ImGui::SetCursorPos(cursave);
 
         ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10);
@@ -296,7 +293,7 @@ void EngineMainMenuBar::CreateNewProjectPopup()
         }
         ImGui::SameLine();
         ImGui::SetCursorPos(newpos);
-        ImGui::Image((ImTextureID) EngineAssetManager::Get()->textures["Folder Icon"].id, { 26, 26});
+        ImGui::Image((ImTextureID) EngineAssetManager::Get()->m_textures["Folder Icon"].id, { 26, 26});
 
         ImGui::SetCursorPosX(260);
         ImGui::Text("PROJECT TYPE");

@@ -21,8 +21,15 @@ static int s_emptyTab = 1;
 void OpenedFilesDock::Render()
 {    
     ImGui::SetNextWindowClass(&m_windowClass);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 1, 1 });
+
+    ImGui::PushStyleColor(ImGuiCol_Border, { 0.3, 0.3, 0.3, 1});
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.0641,0.0641,0.0641, 1.00f));
+    ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5);
+    ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1);
     ImGui::Begin("Opened Files");
 
+    ImGui::BeginChild("Tabs child", { -1, -1}, true);
     if(m_files.size() > 0)
     {
         ImGui::PushStyleVar(ImGuiStyleVar_TabRounding, 5);
@@ -72,8 +79,10 @@ void OpenedFilesDock::Render()
         ImGui::SetCursorPos({ ImGui::GetWindowSize().x / 2 - (size.x / 2), ImGui::GetWindowSize().y / 2 - (size.y / 2) });
         ImGui::TextDisabled("Ctrl + N to create new file");
     }
-
+    ImGui::EndChild();
     ImGui::End();
+    ImGui::PopStyleVar(3);
+    ImGui::PopStyleColor(2);
 }
 
 void OpenedFilesDock::Destroy()

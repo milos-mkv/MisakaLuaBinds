@@ -6,22 +6,22 @@
 #include <engine/gl/Texture.hpp>
 #include <unordered_map>
 #include <imgui.h>
-
+#include <utils/Types.hpp>
 class EngineAssetManager
 {
 private:
-    static inline std::shared_ptr<EngineAssetManager> s_instance = nullptr;
+    static inline PTR<EngineAssetManager> s_instance = nullptr;
 
 public:
-    static std::shared_ptr<EngineAssetManager> Get();
+    static PTR<EngineAssetManager> Get();
     
     void Destroy();
 
     EngineAssetManager();
    ~EngineAssetManager();
    
-    std::unordered_map<std::string, Texture> textures;
-    std::unordered_map<std::string, ImFont*> fonts;
+    std::unordered_map<std::string, Texture> m_textures;
+    std::unordered_map<std::string, ImFont*> m_fonts;
 };
 
 #endif

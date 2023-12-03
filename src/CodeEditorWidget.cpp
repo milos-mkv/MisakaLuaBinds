@@ -41,7 +41,7 @@ CodeEditorWidget::~CodeEditorWidget()
 void CodeEditorWidget::Render()
 {
     ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImGui::ColorConvertU32ToFloat4(4279242768));
-    ImGui::PushFont(EngineAssetManager::Get()->fonts["JetBrains"]);
+    ImGui::PushFont(EngineAssetManager::Get()->m_fonts["JetBrains"]);
     m_editor->Render(m_path.c_str());
     ImGui::PopFont();
     ImGui::PopStyleColor();
@@ -51,7 +51,7 @@ void CodeEditorWidget::Save()
 {
     if (m_path.empty())
     {
-        m_path = SaveFileDialog();
+        m_path = EngineSaveFileDialog();
 
         if (m_path.empty())
         {
@@ -84,7 +84,7 @@ void CodeEditorWidget::Save()
 
 void CodeEditorWidget::SaveAs()
 {
-    std::string path = SaveFileDialog();
+    std::string path = EngineSaveFileDialog();
 
     if (path.empty())
     {
