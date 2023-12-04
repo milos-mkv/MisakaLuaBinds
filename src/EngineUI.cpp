@@ -28,7 +28,7 @@ EngineUI::EngineUI()
     m_uiDocks[typeid(DirectoryViewDock)] = CreatePTR(DirectoryViewDock);
     m_uiDocks[typeid(OpenedFilesDock)]   = CreatePTR(OpenedFilesDock);
     m_uiDocks[typeid(StatusBarDock)]     = CreatePTR(StatusBarDock);
-    m_uiDocks[typeid(OutputDock)]     = CreatePTR(OutputDock);
+    m_uiDocks[typeid(OutputDock)]        = CreatePTR(OutputDock);
 }
 
 

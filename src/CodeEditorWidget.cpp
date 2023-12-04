@@ -42,7 +42,7 @@ void CodeEditorWidget::Render()
 {
     ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImGui::ColorConvertU32ToFloat4(4279242768));
     ImGui::PushFont(EngineAssetManager::Get()->m_fonts["JetBrains"]);
-    m_editor->Render(m_path.c_str());
+    m_editor->Render(m_path.c_str(), {-6, -6}, false);
     ImGui::PopFont();
     ImGui::PopStyleColor();
 }

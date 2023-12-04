@@ -20,6 +20,7 @@ static int s_emptyTab = 1;
 
 void OpenedFilesDock::Render()
 {    
+    // ImGui::ShowDemoWindow();
     ImGui::SetNextWindowClass(&m_windowClass);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 1, 1 });
 
@@ -27,15 +28,32 @@ void OpenedFilesDock::Render()
     ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.0641,0.0641,0.0641, 1.00f));
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5);
     ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1);
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.0941,0.0941,0.0941, 1.00f});
     ImGui::Begin("Opened Files");
-
-    ImGui::BeginChild("Tabs child", { -1, -1}, true);
+    
     if(m_files.size() > 0)
     {
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.0941,0.0941,0.0941, 1.00f));
+        ImGui::BeginChild("ASDASDAS");
         ImGui::PushStyleVar(ImGuiStyleVar_TabRounding, 5);
         ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, { 0, 0 });
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0, 0 });
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 10, 10 });
+
+        auto cur = ImGui::GetCursorPos();
+
+        ImGui::SetCursorPosY(cur.y + 39);
+            ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.0641,0.0641,0.0641, 1.00f));
+
+        ImGui::BeginChild("###Tabs childsas", { -1, -1}, true);
+        // ImGui::Text("TESTST");
+        ImGui::EndChild();
+        ImGui::PopStyleColor();
+
+        ImGui::SetCursorPos({cur.x, cur.y});
+
+        ImGui::Text("    ");
+        ImGui::SameLine();
 
         if (ImGui::BeginTabBar("Open files tab bar", m_tabBarFlags)) 
         {
@@ -45,7 +63,12 @@ void OpenedFilesDock::Render()
              
                 if (ImGui::BeginTabItem((ICON_FA_CODE " " + value->m_fileName + "   ").c_str(), &value->m_alive, value->m_flags)) 
                 { 
+                    ImGui::SetCursorPos({
+                        ImGui::GetCursorPosX() + 5,
+                        ImGui::GetCursorPosY() + 5
+                    });
                     m_selected = key;
+                    // ImGui::Text("ASDASAA");
                     value->Render();
                     ImGui::EndTabItem();
                 }
@@ -72,17 +95,23 @@ void OpenedFilesDock::Render()
             }  
         }
         ImGui::PopStyleVar(4);
+
+        ImGui::EndChild();
+        ImGui::PopStyleColor();
     }
     else 
     {
+            ImGui::BeginChild("Tabs child", { -1, -1}, true);
+
         auto size = ImGui::CalcTextSize("Ctrl + N to create new file");
         ImGui::SetCursorPos({ ImGui::GetWindowSize().x / 2 - (size.x / 2), ImGui::GetWindowSize().y / 2 - (size.y / 2) });
         ImGui::TextDisabled("Ctrl + N to create new file");
+            ImGui::EndChild();
+
     }
-    ImGui::EndChild();
     ImGui::End();
     ImGui::PopStyleVar(3);
-    ImGui::PopStyleColor(2);
+    ImGui::PopStyleColor(3);
 }
 
 void OpenedFilesDock::Destroy()
@@ -144,7 +173,7 @@ OpenedFilesDock::OpenedFilesDock()
                   | ImGuiTabBarFlags_Reorderable 
                   | ImGuiTabBarFlags_DockNode
                   | ImGuiTabBarFlags_NoTabListScrollingButtons
-                  | ImGuiTabBarFlags_FittingPolicyScroll;
+                  ;
 }
 
 OpenedFilesDock::~OpenedFilesDock()
