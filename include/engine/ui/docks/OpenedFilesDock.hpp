@@ -4,6 +4,7 @@
 #include <engine/ui/EngineUIDock.hpp>
 #include <engine/ui/widgets/CodeEditorWidget.hpp>
 #include <unordered_map>
+#include <utils/FileSystemUtils.hpp>
 #include <string>
 #include <utils/Types.hpp>
 #include <imgui.h>
@@ -25,7 +26,7 @@ public:
     virtual void Render()  override;
     virtual void Destroy() override;
 
-    void OpenFile(const std::string& path, std::string fileName = "", std::string ext = "");
+    void OpenFile(const File& file);
     void OpenEmptyFile();
 };
 

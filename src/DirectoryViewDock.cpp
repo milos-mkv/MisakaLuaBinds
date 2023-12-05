@@ -55,7 +55,7 @@ void DirectoryViewDock::RecursivelyDisplayDirectoryNode(const PTR<DirectoryNode>
             m_selectedFile = parentNode->Path();
 
             // TODO: Change params.
-            EngineUI::Get()->GetDock<OpenedFilesDock>()->OpenFile(parentNode->Path(), parentNode->Name(), parentNode->Extn());
+            EngineUI::Get()->GetDock<OpenedFilesDock>()->OpenFile(parentNode->m_file);
         }
 
         ImGui::PopStyleVar();

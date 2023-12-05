@@ -35,6 +35,7 @@ void EngineMainMenuBar::Render()
 
     if (ImGui::BeginMainMenuBar())
     {
+        auto cur =ImGui::GetCursorPos();
         ImGui::PushStyleColor(ImGuiCol_Border, { 0.3, 0.3, 0.3, 1 });
         ImGui::PushStyleColor(ImGuiCol_Text, { 0.8, 0.8, 0.8, 1.0});
         ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 5);
@@ -148,6 +149,10 @@ void EngineMainMenuBar::Render()
         }
         ImGui::PopStyleColor(2);
         ImGui::PopStyleVar(4);
+
+        cur.x = ImGui::GetWindowSize().x - 100;
+        ImGui::SetCursorPos(cur);
+        ImGui::Text(std::to_string((int)ImGui::GetIO().Framerate).c_str());
         ImGui::EndMainMenuBar();
     }
 
@@ -165,7 +170,7 @@ void EngineMainMenuBar::OpenFile()
 
     if (!path.empty())
     {
-        EngineUI::Get()->GetDock<OpenedFilesDock>()->OpenFile(path.c_str());
+        EngineUI::Get()->GetDock<OpenedFilesDock>()->OpenFile(File(path));
     }
 }
 

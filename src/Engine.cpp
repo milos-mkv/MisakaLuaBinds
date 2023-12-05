@@ -55,7 +55,6 @@ void Engine::RenderImGui()
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    LOG(ImGui::GetIO().Framerate);
 }
 
 Engine::~Engine()
@@ -127,7 +126,7 @@ void Engine::SetStyleForImGui()
     style.Colors[ImGuiCol_WindowBg]              = bgColor;
     style.Colors[ImGuiCol_ChildBg]               = ImVec4(0.13f, 0.14f, 0.15f, 1.00f);
     style.Colors[ImGuiCol_PopupBg]               = bgColor;
-    style.Colors[ImGuiCol_Border]                = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+    style.Colors[ImGuiCol_Border]                = ImVec4(0.3f, 0.3f, 0.3f, 0.00f);
     style.Colors[ImGuiCol_BorderShadow]          = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
     style.Colors[ImGuiCol_FrameBg]               = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
     style.Colors[ImGuiCol_FrameBgHovered]        = ImVec4(0.38f, 0.38f, 0.38f, 1.00f);
