@@ -55,6 +55,7 @@ void Engine::RenderImGui()
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    LOG(ImGui::GetIO().Framerate);
 }
 
 Engine::~Engine()

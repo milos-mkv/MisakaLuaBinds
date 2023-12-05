@@ -42,7 +42,7 @@ void OpenedFilesDock::Render()
 
         auto cur = ImGui::GetCursorPos();
 
-        ImGui::SetCursorPosY(cur.y + 39);
+        ImGui::SetCursorPosY(cur.y + 38);
             ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.0641,0.0641,0.0641, 1.00f));
 
         ImGui::BeginChild("###Tabs childsas", { -1, -1}, true);
@@ -52,8 +52,8 @@ void OpenedFilesDock::Render()
 
         ImGui::SetCursorPos({cur.x, cur.y});
 
-        ImGui::Text("    ");
-        ImGui::SameLine();
+
+        auto curpos = ImGui::GetCursorPos();
 
         if (ImGui::BeginTabBar("Open files tab bar", m_tabBarFlags)) 
         {
@@ -68,7 +68,6 @@ void OpenedFilesDock::Render()
                         ImGui::GetCursorPosY() + 5
                     });
                     m_selected = key;
-                    // ImGui::Text("ASDASAA");
                     value->Render();
                     ImGui::EndTabItem();
                 }
@@ -95,6 +94,55 @@ void OpenedFilesDock::Render()
             }  
         }
         ImGui::PopStyleVar(4);
+
+        
+        curpos.x = ImGui::GetWindowSize().x - 104;
+        ImGui::SetCursorPos(curpos);
+
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, {0.0641,0.0641,0.0641, 1});
+        ImGui::PushStyleColor(ImGuiCol_Button, {0.0641,0.6641,0.0641, 0});
+
+        ImGui::BeginChild("Run Bar", { 104, 33}, true);
+        
+        ImGui::SetCursorPosY(curpos.y + 3);
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 3);
+
+        auto c = ImGui::GetCursorPos();
+        if (ImGui::Button("##ICON_FA_PLAY", { 30, 27}))
+        {
+
+        }
+        c.x += 8;
+        c.y += 5;
+        ImGui::SetCursorPos(c);
+        ImGui::Text(ICON_FA_PLAY);
+        ImGui::SameLine();
+        c.y -= 5;
+        c.x += 25;
+        ImGui::SetCursorPos(c);
+        if (ImGui::Button("##ICON_FA_PAUSE", { 30, 27}))
+        {}
+        c.x += 9;
+        c.y += 5;
+        ImGui::SetCursorPos(c);
+
+        ImGui::Text(ICON_FA_PAUSE);
+
+        ImGui::SameLine();
+        c.y -= 5;
+        c.x += 25;
+        ImGui::SetCursorPos(c);
+
+        if (ImGui::Button("##ICON_FA_SLIDERS", { 30, 27}))
+        {
+
+        }
+        c.x += 5;
+        c.y += 5;
+        ImGui::SetCursorPos(c);
+        ImGui::Text(ICON_FA_SLIDERS);
+        ImGui::EndChild();
+        ImGui::PopStyleColor(2);
 
         ImGui::EndChild();
         ImGui::PopStyleColor();
