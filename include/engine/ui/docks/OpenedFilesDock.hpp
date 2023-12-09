@@ -26,6 +26,8 @@ public:
     virtual void Render()  override;
     virtual void Destroy() override;
 
+
+    void RenderRunBar(ImVec2 curpos);
     void OpenFile(const File& file);
     void OpenEmptyFile();
 };

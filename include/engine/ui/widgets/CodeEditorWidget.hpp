@@ -4,19 +4,18 @@
 #include <string>
 #include <texteditor/TextEditor.h>
 #include <utils/Types.hpp>
+#include <utils/FileSystemUtils.hpp>
 #include <imgui.h>
 
 class CodeEditorWidget
 {
 public:
-    std::string m_path;
-    std::string m_fileName;
-    std::string m_ext;
+    File m_file;
     PTR<TextEditor> m_editor;
     ImGuiTabItemFlags m_flags;
     bool m_alive;
 
-    CodeEditorWidget(const std::string& path, const std::string& fileName, const std::string& ext);
+    CodeEditorWidget(const File& file);
    ~CodeEditorWidget();
 
     void Render();

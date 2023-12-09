@@ -30,6 +30,8 @@ void OpenedFilesDock::Render()
 
     ImGui::Begin("Opened Files");
     
+    auto curposs = ImGui::GetCursorPos();
+
     if(m_files.size() > 0)
     {
         ImGui::PushStyleColor(ImGuiCol_ChildBg, COLOR_BG_4);
@@ -51,16 +53,17 @@ void OpenedFilesDock::Render()
 
         ImGui::PopStyleColor();
 
-        ImGui::SetCursorPos({cur.x, cur.y});
-        auto curpos = ImGui::GetCursorPos();
+        ImGui::SetCursorPos(cur);
 
         if (ImGui::BeginTabBar("Open files tab bar", m_tabBarFlags)) 
         {
             for (const auto& [key, value] : m_files)
             {
                 ImGui::PushID(key.c_str());
-             
-                if (ImGui::BeginTabItem((ICON_FA_CODE " " + value->m_fileName + "   ").c_str(), &value->m_alive, value->m_flags)) 
+
+                auto name = (value->m_file.Name().empty()) ? key : value->m_file.Name();
+
+                if (ImGui::BeginTabItem((ICON_FA_CODE " " + name + "   ").c_str(), &value->m_alive, value->m_flags)) 
                 { 
                     ImGui::SetCursorPos({
                         ImGui::GetCursorPosX() + 5,
@@ -94,11 +97,40 @@ void OpenedFilesDock::Render()
         }
         ImGui::PopStyleVar(4);
 
-        
-        curpos.x = ImGui::GetWindowSize().x - 104;
+        ImGui::EndChild();
+        ImGui::PopStyleColor();
+    }
+    else 
+    {
+        ImGui::SetCursorPosY(curposs.y + 38);
+        // ImGui::BeginChild("No Tabs Display Child", { -1, -1 }, false);
+        // {
+            auto size = ImGui::CalcTextSize("Ctrl + N to create new file");
+            ImGui::SetCursorPos({ ImGui::GetWindowSize().x / 2 - (size.x / 2), ImGui::GetWindowSize().y / 2 - (size.y / 2) });
+            ImGui::TextDisabled("Ctrl + N to create new file");
+        // }
+        // ImGui::EndChild();
+
+    }
+
+    RenderRunBar(curposs);
+
+    ImGui::End();
+    ImGui::PopStyleVar(3);
+    ImGui::PopStyleColor(3);
+}
+
+void OpenedFilesDock::Destroy()
+{
+    LOG("OpenedFilesDock::Destroy");
+}
+
+void OpenedFilesDock::RenderRunBar(ImVec2 curpos)
+{
+    curpos.x = ImGui::GetWindowSize().x - 106;
         ImGui::SetCursorPos(curpos);
 
-        ImGui::PushStyleColor(ImGuiCol_ChildBg, {0.0641,0.0641,0.0641, 1});
+   ImGui::PushStyleColor(ImGuiCol_ChildBg, {0.0641,0.0641,0.0641, 1});
         ImGui::PushStyleColor(ImGuiCol_Button, {0.0641,0.6641,0.0641, 0});
 
         ImGui::BeginChild("Run Bar", { 104, 33}, true);
@@ -142,40 +174,16 @@ void OpenedFilesDock::Render()
         ImGui::Text(ICON_FA_SLIDERS);
         ImGui::EndChild();
         ImGui::PopStyleColor(2);
-
-        ImGui::EndChild();
-        ImGui::PopStyleColor();
-    }
-    else 
-    {
-        ImGui::BeginChild("No Tabs Display Child", { -1, -1 }, true);
-        {
-            auto size = ImGui::CalcTextSize("Ctrl + N to create new file");
-            ImGui::SetCursorPos({ ImGui::GetWindowSize().x / 2 - (size.x / 2), ImGui::GetWindowSize().y / 2 - (size.y / 2) });
-            ImGui::TextDisabled("Ctrl + N to create new file");
-        }
-        ImGui::EndChild();
-
-    }
-
-    ImGui::End();
-    ImGui::PopStyleVar(3);
-    ImGui::PopStyleColor(3);
-}
-
-void OpenedFilesDock::Destroy()
-{
-    LOG("OpenedFilesDock::Destroy");
 }
 
 void OpenedFilesDock::OpenFile(const File& file)
 {
     LOG("OpenedFilesDock::OpenFile", file.Path());
-    std::unordered_map<std::string, PTR<CodeEditorWidget>>::iterator it = m_files.find(file.Path().c_str());
+    auto it = m_files.find(file.Path());
 
     if (it == m_files.end())
     {
-        m_files[file.Path()] = CreatePTR(CodeEditorWidget, file.Path(), file.Name(), file.Extn());
+        m_files[file.Path()] = CreatePTR(CodeEditorWidget, file);
     }
     else
     {
@@ -191,9 +199,7 @@ void OpenedFilesDock::OpenEmptyFile()
     LOG("OpenedFilesDock::OpenEmptyFile");
 
     static int s_emptyTab = 1;
-    std::string fileName = "Untitled " + std::to_string(s_emptyTab);
-    m_files[fileName] = CreatePTR(CodeEditorWidget, "", fileName, "");
-    s_emptyTab += 1;
+    m_files["Untitled " + std::to_string(s_emptyTab++)] = CreatePTR(CodeEditorWidget, File());
 }
 
 OpenedFilesDock::OpenedFilesDock()

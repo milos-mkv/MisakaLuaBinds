@@ -13,6 +13,8 @@
 #include <thread>
 #include <utils/Types.hpp>
 #include <utils/FileSystemUtils.hpp>
+#include <imgui.h>
+#include <imgui_internal.h>
 
 class DirectoryViewDock : public EngineUIDock
 {
@@ -21,6 +23,7 @@ public:
     std::string m_selectedFile;
     PTR<DirectoryNode> m_rootNode;
     ImGuiWindowClass m_windowClass;
+    ImGuiWindowFlags m_modalFlags;
     bool m_visible;
     PTR<DirectoryNode> m_removeFile;
 
@@ -38,7 +41,9 @@ public:
     void OpenFileContextMenu(const PTR<DirectoryNode>& id);
     void OpenFolderContextMenu(const PTR<DirectoryNode>& id);
     
-    void RecursivelyDisplayDirectoryNode(const PTR<DirectoryNode>& parentNode);
+    ImRect RecursivelyDisplayDirectoryNode(const PTR<DirectoryNode>& parentNode);
+    void OpenDeleteModal(const PTR<DirectoryNode>& path);
+    void OpenRenameModal(const PTR<DirectoryNode>& path);
 };
 
 #endif

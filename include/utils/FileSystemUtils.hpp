@@ -8,21 +8,23 @@
 
 class File
 {
-private:
+public:
     std::filesystem::path m_path;
 
 public:
     File() { }
-    File(const std::string& path);
+    File(const std::string& path) : m_path(std::filesystem::path(path)) { }
 
-    std::string Path() const;
-    std::string Name() const;
-    std::string Extn() const;
+    std::string Path() const { return m_path.c_str(); }
+    std::string Name() const { return m_path.filename().c_str(); }
+    std::string Extn() const { return m_path.extension().c_str(); }
+
     std::string Read();
     bool Write(const std::string& data);
+    void Rename(const std::string& name);
 };
 
-class DirectoryNode
+class DirectoryNode : public std::enable_shared_from_this<DirectoryNode>
 {
 public:
     std::thread                     m_thread;
@@ -37,12 +39,16 @@ public:
 
     void RecursivelyAddDirectoryNodes(const PTR<DirectoryNode>& parentNode, std::filesystem::directory_iterator directoryIterator);
 
-    const std::string Name() const { return m_file.Name(); }
-    const std::string Path() const { return m_file.Path(); }
-    const std::string Extn() const { return m_file.Extn(); }
+    std::string Name() const { return m_file.Name(); }
+    std::string Path() const { return m_file.Path(); }
+    std::string Extn() const { return m_file.Extn(); }
+
+    void Rename(const std::string& name);
 
 public:
     static PTR<DirectoryNode> CreateDirectryNodeTreeFromPathAsync(const std::string& rootPath);
 };
+
+
 
 #endif

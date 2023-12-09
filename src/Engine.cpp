@@ -173,5 +173,12 @@ void Engine::SetStyleForImGui()
     style.Colors[ImGuiCol_ModalWindowDimBg]      = ImVec4(0.00f, 0.00f, 0.00f, 0.75f);
     style.GrabRounding                           = style.FrameRounding = 2.3f;
     // style.WindowMenuButtonPosition               = ImGuiDir_None;
-    style.TabRounding = 0;
+    style.TabRounding = 5;
+    style.ChildRounding = 5;
+    style.GrabRounding = 5;
+    style.FrameRounding = 5;
+    style.PopupRounding = 5;
+    // style.WindowRounding = 5;
+    style.ScrollbarRounding = 5;
+    style.ChildBorderSize = 1;
 }
