@@ -27,17 +27,18 @@ public:
 class DirectoryNode : public std::enable_shared_from_this<DirectoryNode>
 {
 public:
-    std::thread                     m_thread;
     File                            m_file;
     std::vector<PTR<DirectoryNode>> m_children;
     bool                            m_isDirectory;
     PTR<DirectoryNode>              m_parent;
+    bool                            m_open;
 
 public:
     DirectoryNode() {} 
     DirectoryNode(const std::string& filePath);
 
     void RecursivelyAddDirectoryNodes(const PTR<DirectoryNode>& parentNode, std::filesystem::directory_iterator directoryIterator);
+    void Open();
 
     std::string Name() const { return m_file.Name(); }
     std::string Path() const { return m_file.Path(); }

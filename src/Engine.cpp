@@ -171,6 +171,9 @@ void Engine::SetStyleForImGui()
     style.Colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
     style.Colors[ImGuiCol_NavWindowingDimBg]     = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
     style.Colors[ImGuiCol_ModalWindowDimBg]      = ImVec4(0.00f, 0.00f, 0.00f, 0.75f);
+    style.Colors[ImGuiCol_TableRowBg]            = COLOR_CHILD_BG_4;
+    style.Colors[ImGuiCol_TableRowBgAlt]         = ImVec4(0.07f, 0.07f, 0.07f, 1.00f);
+
     style.GrabRounding                           = style.FrameRounding = 2.3f;
     // style.WindowMenuButtonPosition               = ImGuiDir_None;
     style.TabRounding = 5;
@@ -178,7 +181,6 @@ void Engine::SetStyleForImGui()
     style.GrabRounding = 5;
     style.FrameRounding = 5;
     style.PopupRounding = 5;
-    // style.WindowRounding = 5;
     style.ScrollbarRounding = 5;
     style.ChildBorderSize = 1;
 }

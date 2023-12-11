@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <utils/Logger.hpp>
 
 std::string File::Read() 
 {
@@ -34,7 +35,9 @@ void File::Rename(const std::string& name)
     m_path = std::filesystem::path(newPath);
 }
 
-DirectoryNode::DirectoryNode(const std::string& filePath) : m_file(File(filePath)), m_parent(nullptr) { }
+DirectoryNode::DirectoryNode(const std::string& filePath) : m_file(File(filePath)), m_parent(nullptr), m_open(false) { 
+    m_isDirectory = std::filesystem::is_directory(filePath);
+}
 
 void DirectoryNode::RecursivelyAddDirectoryNodes(const PTR<DirectoryNode>& parentNode, std::filesystem::directory_iterator directoryIterator)
 {
@@ -57,19 +60,38 @@ void DirectoryNode::RecursivelyAddDirectoryNodes(const PTR<DirectoryNode>& paren
 
 PTR<DirectoryNode> DirectoryNode::CreateDirectryNodeTreeFromPathAsync(const std::string& rootPath)
 {
-	PTR<DirectoryNode> rootNode = CreatePTR(DirectoryNode, rootPath);
-	if (rootNode->m_isDirectory = std::filesystem::is_directory(rootPath); rootNode->m_isDirectory)
+	return CreatePTR(DirectoryNode, rootPath);
+}
+
+void DirectoryNode::Open()
+{
+    if (m_open || !m_isDirectory)
     {
-        if(rootNode->m_thread.joinable()) { rootNode->m_thread.join(); }
-		rootNode->m_thread = std::thread(&DirectoryNode::RecursivelyAddDirectoryNodes, rootNode.get(), rootNode, std::filesystem::directory_iterator(rootPath));
+        return;
     }
-	return rootNode;
+    m_open = true;
+    LOG(m_file.Path());
+    auto directoryIterator = std::filesystem::directory_iterator(m_file.Path());
+
+    for (const std::filesystem::directory_entry& entry : directoryIterator)
+	{
+		PTR<DirectoryNode> childNode = CreatePTR(DirectoryNode, entry.path().c_str());
+        m_children.push_back(childNode);
+        LOG(childNode->m_file.Name());
+        childNode->m_parent = shared_from_this();
+	}
+    
+    std::sort(m_children.begin(), m_children.end(),[](const PTR<DirectoryNode>& d1, const PTR<DirectoryNode>& d2){
+        return d1->m_file.Name()[0] < d2->m_file.Name()[0];
+    });
+
+	auto moveDirectoriesToFront = [](const PTR<DirectoryNode>& a, const PTR<DirectoryNode>& b) { return (a->m_isDirectory > b->m_isDirectory); };
+	std::sort(m_children.begin(), m_children.end(), moveDirectoriesToFront);
 }
 
 void DirectoryNode::Rename(const std::string& name)
 {
     m_file.Rename(name);
     m_children.clear();
-    if(m_thread.joinable()) {  m_thread.join(); }
-	m_thread = std::thread(&DirectoryNode::RecursivelyAddDirectoryNodes, this, shared_from_this(), std::filesystem::directory_iterator(m_file.Path()));
+    m_open = false;
 }
