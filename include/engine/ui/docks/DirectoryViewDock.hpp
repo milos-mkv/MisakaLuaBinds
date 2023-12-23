@@ -38,9 +38,7 @@ public:
 
 public:
     void OpenContextMenu(const PTR<DirectoryNode>& path, bool isDirectory);
-    void OpenFileContextMenu(const PTR<DirectoryNode>& id);
-    void OpenFolderContextMenu(const PTR<DirectoryNode>& id);
-    
+    void RenderContextMenu(const PTR<DirectoryNode>& path);
     ImRect RecursivelyDisplayDirectoryNode(const PTR<DirectoryNode>& parentNode);
     void OpenDeleteModal(const PTR<DirectoryNode>& path);
     void OpenRenameModal(const PTR<DirectoryNode>& path);

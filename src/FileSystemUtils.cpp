@@ -70,14 +70,12 @@ void DirectoryNode::Open()
         return;
     }
     m_open = true;
-    LOG(m_file.Path());
     auto directoryIterator = std::filesystem::directory_iterator(m_file.Path());
 
     for (const std::filesystem::directory_entry& entry : directoryIterator)
 	{
 		PTR<DirectoryNode> childNode = CreatePTR(DirectoryNode, entry.path().c_str());
         m_children.push_back(childNode);
-        LOG(childNode->m_file.Name());
         childNode->m_parent = shared_from_this();
 	}
     
@@ -91,6 +89,11 @@ void DirectoryNode::Open()
 
 void DirectoryNode::Rename(const std::string& name)
 {
+    if (name.empty())
+    {
+        LOG("FAILED TO RENAME!");
+        return;
+    }
     m_file.Rename(name);
     m_children.clear();
     m_open = false;

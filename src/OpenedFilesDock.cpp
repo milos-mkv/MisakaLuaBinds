@@ -20,13 +20,12 @@ void OpenedFilesDock::Render()
 {    
     ImGui::SetNextWindowClass(&m_windowClass);
 
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 1, 1 });
-    ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5);
-    ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 });
+    ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 0);
 
     ImGui::PushStyleColor(ImGuiCol_Border, COLOR_BORDER_4);
     ImGui::PushStyleColor(ImGuiCol_ChildBg, COLOR_CHILD_BG_4);
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, COLOR_BG_4);
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, COLOR_CHILD_BG_4);
 
     ImGui::Begin("Opened Files");
     
@@ -34,26 +33,14 @@ void OpenedFilesDock::Render()
 
     if(m_files.size() > 0)
     {
-        ImGui::PushStyleColor(ImGuiCol_ChildBg, COLOR_BG_4);
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, COLOR_CHILD_BG_4);
         ImGui::BeginChild("Tabs in display");
         
-        ImGui::PushStyleVar(ImGuiStyleVar_TabRounding, 5);
+        ImGui::PushStyleVar(ImGuiStyleVar_TabRounding, 0);
         ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, { 0, 0 });
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0, 0 });
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 10, 10 });
 
-        auto cur = ImGui::GetCursorPos();
-
-        ImGui::SetCursorPosY(cur.y + 38);
-        
-        ImGui::PushStyleColor(ImGuiCol_ChildBg, COLOR_CHILD_BG_4);
-
-        ImGui::BeginChild("ActiveTabFrameBorderWindow", { -1, -1 }, true);
-        ImGui::EndChild();
-
-        ImGui::PopStyleColor();
-
-        ImGui::SetCursorPos(cur);
 
         if (ImGui::BeginTabBar("Open files tab bar", m_tabBarFlags)) 
         {
@@ -103,20 +90,15 @@ void OpenedFilesDock::Render()
     else 
     {
         ImGui::SetCursorPosY(curposs.y + 38);
-        // ImGui::BeginChild("No Tabs Display Child", { -1, -1 }, false);
-        // {
-            auto size = ImGui::CalcTextSize("Ctrl + N to create new file");
-            ImGui::SetCursorPos({ ImGui::GetWindowSize().x / 2 - (size.x / 2), ImGui::GetWindowSize().y / 2 - (size.y / 2) });
-            ImGui::TextDisabled("Ctrl + N to create new file");
-        // }
-        // ImGui::EndChild();
-
+        auto size = ImGui::CalcTextSize("Ctrl + N to create new file");
+        ImGui::SetCursorPos({ ImGui::GetWindowSize().x / 2 - (size.x / 2), ImGui::GetWindowSize().y / 2 - (size.y / 2) });
+        ImGui::TextDisabled("Ctrl + N to create new file");
     }
 
     RenderRunBar(curposs);
 
     ImGui::End();
-    ImGui::PopStyleVar(3);
+    ImGui::PopStyleVar(2);
     ImGui::PopStyleColor(3);
 }
 
@@ -130,7 +112,7 @@ void OpenedFilesDock::RenderRunBar(ImVec2 curpos)
     curpos.x = ImGui::GetWindowSize().x - 106;
         ImGui::SetCursorPos(curpos);
 
-   ImGui::PushStyleColor(ImGuiCol_ChildBg, {0.0641,0.0641,0.0641, 1});
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, {0.0641,0.0641,0.0641, 1});
         ImGui::PushStyleColor(ImGuiCol_Button, {0.0641,0.6641,0.0641, 0});
 
         ImGui::BeginChild("Run Bar", { 104, 33}, true);

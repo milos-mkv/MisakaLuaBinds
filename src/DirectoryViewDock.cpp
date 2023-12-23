@@ -19,6 +19,13 @@
 
 #include <utils/Logger.hpp>
 
+static void RenderTextWithFont(const std::string& text, const std::string& font)
+{
+    ImGui::PushFont(EngineAssetManager::Get()->m_fonts[font]);
+    ImGui::Text(text.c_str());
+    ImGui::PopFont();
+}
+
 ImRect DirectoryViewDock::RecursivelyDisplayDirectoryNode(const PTR<DirectoryNode>& parentNode)
 {
     ImGui::TableNextRow();
@@ -103,7 +110,6 @@ DirectoryViewDock::DirectoryViewDock() : m_visible(true), m_removeFile(nullptr)
 void DirectoryViewDock::Destroy()
 {
     LOG("DirectoryViewDock::Destroy");
-    // if (m_rootNode->m_thread.joinable()) { m_rootNode->m_thread.join(); }
 }
 
 void DirectoryViewDock::OpenFolder(const std::string& path)
@@ -121,14 +127,13 @@ void DirectoryViewDock::Render()
         return;
     }
 
-    ImGui::ShowDemoWindow();
+    // ImGui::ShowDemoWindow();
         
     ImGui::SetNextWindowClass(&m_windowClass);
 
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 1, 1 });
-
-    ImGui::PushStyleColor(ImGuiCol_Text, { 0.5f, 0.5f, 0.5f, 1.0f });
-    ImGui::PushStyleColor(ImGuiCol_Border, { 0.3f, 0.3f, 0.3f, 1.0f });
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 });
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, COLOR_CHILD_BG_4);
+    ImGui::PushStyleColor(ImGuiCol_Text, { 0.8f, 0.8f, 0.8f, 1.0f });
     ImGui::PushStyleColor(ImGuiCol_ChildBg, COLOR_CHILD_BG_4);
     ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, COLOR_CHILD_BG_4);
 
@@ -175,7 +180,7 @@ void DirectoryViewDock::Render()
             ImGui::BeginChild("##DirectoryViewDisplay", {-1, -1});
             if (m_rootNode && !m_currentFolder.empty())
             {
-                if(ImGui::BeginTable("test table", 1, ImGuiTableFlags_RowBg))
+                if(ImGui::BeginTable("test table", 1))
                 {
                     RecursivelyDisplayDirectoryNode(m_rootNode);
                     ImGui::EndTable();
@@ -214,79 +219,33 @@ DirectoryViewDock::~DirectoryViewDock()
 
 void DirectoryViewDock::OpenContextMenu(const PTR<DirectoryNode>& path, bool isDirectory)
 {
-    ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, { 0.1, 0.5 });
-    ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 5);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 10, 10 });
-
     ImGui::PushStyleColor(ImGuiCol_Button, { 0, 0, 0, 0 });
-    ImGui::PushStyleColor(ImGuiCol_PopupBg, { 0.0641, 0.0641, 0.0641, 1 });
+    ImGui::PushStyleColor(ImGuiCol_PopupBg, COLOR_CHILD_BG_4);
 
     if (ImGui::BeginPopupContextItem())
     { 
-        if (isDirectory)
-        {
-            OpenFolderContextMenu(path);
-        }
-        else
-        {
-            OpenFileContextMenu(path);
-        }
+        RenderContextMenu(path);
         ImGui::EndPopup();
     }
 
     ImGui::PopStyleColor(2);
-    ImGui::PopStyleVar(3);
-}
-
-void DirectoryViewDock::OpenFileContextMenu(const PTR<DirectoryNode>& path)
-{    
-    bool openDeleteModal = false;
-    bool openRenameModal = false;
-
-    if(ImGui::Button("Rename...", { 150, 25 }))
-    {
-        openRenameModal = true;
-    }
-
-    if(ImGui::Button("Delete file", { 150, 25 }))
-    {
-        openDeleteModal = true;
-    }
-
-    if (openDeleteModal)
-    {
-        ImGui::OpenPopup("Open Delete Modal");
-    }
-    
-    if (openRenameModal)
-    {
-        ImGui::OpenPopup("Open Rename Modal");
-    }
-    OpenDeleteModal(path);
-    OpenRenameModal(path);
 }
 
 void DirectoryViewDock::OpenRenameModal(const PTR<DirectoryNode>& path)
 {
-    const int modalWidth  = 400;
-    const int modalHeight = 120;
-
+    auto modalSize  = ImVec2(400, 120);
+    auto workSize   = ImGui::GetMainViewport()->WorkSize;
     bool unsuedOpen = true;
 
-    ImGui::SetNextWindowPos({ ImGui::GetMainViewport()->WorkSize.x / 2 - modalWidth / 2, ImGui::GetMainViewport()->WorkSize.y / 2 - modalHeight / 2 });
-    ImGui::SetNextWindowSize({ modalWidth, modalHeight });
-
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 5);
-    ImGui::PushStyleColor(ImGuiCol_Border, COLOR_BORDER_4);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 1, 1 });
+    ImGui::SetNextWindowPos({ workSize.x / 2 - modalSize.x / 2, workSize.y / 2 - modalSize.y / 2 });
+    ImGui::SetNextWindowSize(modalSize);
 
     if (ImGui::BeginPopupModal("Open Rename Modal", &unsuedOpen, m_modalFlags))
     {
         ImGui::SetCursorPosY(5);
-        ImGui::PushFont(EngineAssetManager::Get()->m_fonts["JetBrains"]);
-        ImGui::Text(" RENAME");
-        ImGui::PopFont();
-        ImGui::SetCursorPosX(modalWidth / 2 - ImGui::CalcTextSize("Enter new name:").x / 2);
+        RenderTextWithFont(" RENAME", "JetBrains");
+
+        ImGui::SetCursorPosX(modalSize.x / 2 - ImGui::CalcTextSize("Enter new name:").x / 2);
         ImGui::Text("Enter new name:");
         
         static char filename[255];
@@ -298,23 +257,24 @@ void DirectoryViewDock::OpenRenameModal(const PTR<DirectoryNode>& path)
         }
         ImGui::SetCursorPosX(50);
         ImGui::SetNextItemWidth(300);
+
         ImGui::PushFont(EngineAssetManager::Get()->m_fonts["JetBrains"]);
         ImGui::InputText("##newfileName", filename, 255);
         ImGui::PopFont();
-        ImGui::SetCursorPosX(modalWidth / 2 - 65);
-        ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, { 0.5, 0.5 });
+
+        ImGui::SetCursorPosX(modalSize.x / 2 - 65);
 
         ImGui::PushFont(EngineAssetManager::Get()->m_fonts["JetBrains"]);
         if (ImGui::Button("RENAME", { 60, 30 }))
         {   
             if(path->m_isDirectory)
             {
-                auto oldPath = path->Path();       
-
                 path->Rename(std::string(filename));
+                // TODO: CHECKS
             }
             else
             {
+                // TODO: CHECK;
                 LOG("File rename to:", std::string(filename));     
                 auto oldPath = path->Path();       
                 path->m_file.Rename(std::string(filename));
@@ -344,111 +304,98 @@ void DirectoryViewDock::OpenRenameModal(const PTR<DirectoryNode>& path)
             ImGui::CloseCurrentPopup();
         }
         ImGui::PopFont();
-
-        ImGui::PopStyleVar();
-
         ImGui::EndPopup();
     }
-
-    ImGui::PopStyleVar(2);
-    ImGui::PopStyleColor();
 }
 
 void DirectoryViewDock::OpenDeleteModal(const PTR<DirectoryNode>& path)
 {
-    const int modalWidth  = 400;
-    const int modalHeight = 120;
-
+    auto modalSize  = ImVec2(400, 120);
+    auto workSize   = ImGui::GetMainViewport()->WorkSize;
     bool unsuedOpen = true;
 
-    ImGui::SetNextWindowPos({ ImGui::GetMainViewport()->WorkSize.x / 2 - modalWidth / 2, ImGui::GetMainViewport()->WorkSize.y / 2 - modalHeight / 2 });
-    ImGui::SetNextWindowSize({ modalWidth, modalHeight });
-
-    ImGui::PushStyleColor(ImGuiCol_Border, COLOR_BORDER_4);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 1, 1 });
+    ImGui::SetNextWindowPos({ workSize.x / 2 - modalSize.x / 2, workSize.y / 2 - modalSize.y / 2 });
+    ImGui::SetNextWindowSize(modalSize);
 
     if (ImGui::BeginPopupModal("Open Delete Modal", &unsuedOpen, m_modalFlags))
     {
         ImGui::SetCursorPosY(5);
-        ImGui::PushFont(EngineAssetManager::Get()->m_fonts["JetBrains"]);
-        ImGui::Text(" DELETE");
-        ImGui::PopFont();
+        RenderTextWithFont(" DELETE", "JetBrains");
 
-        ImGui::SetCursorPosX(modalWidth / 2 - ImGui::CalcTextSize(ICON_FA_TRIANGLE_EXCLAMATION).x / 2);
+        ImGui::SetCursorPosX(modalSize.x / 2 - ImGui::CalcTextSize(ICON_FA_TRIANGLE_EXCLAMATION).x / 2);
         ImGui::Text(ICON_FA_TRIANGLE_EXCLAMATION);
 
-        std::string message = std::string("Are you sure that you want to delete ") + ((path->m_isDirectory) ? "folder?" : "file?");
+        auto message = std::string("Are you sure that you want to delete ") + ((path->m_isDirectory) ? "folder?" : "file?");
 
-        ImGui::SetCursorPosX(modalWidth / 2 - ImGui::CalcTextSize(message.c_str()).x / 2);
+        ImGui::SetCursorPosX(modalSize.x / 2 - ImGui::CalcTextSize(message.c_str()).x / 2);
         ImGui::Text(message.c_str());
 
-        ImGui::SetCursorPosX(modalWidth / 2 - 40);
-        ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, { 0.5, 0.5 });
+        ImGui::SetCursorPosX(modalSize.x / 2 - 40);
 
         ImGui::PushFont(EngineAssetManager::Get()->m_fonts["JetBrains"]);
         if (ImGui::Button("YES", { 40, 30 }))
         {
-            if (path->m_isDirectory)
+            bool deleted = false;
+            if (path->m_isDirectory) { deleted = static_cast<bool>(std::filesystem::remove_all(path->Path())); }
+            else                     { deleted = std::filesystem::remove(path->Path()); }
+
+            if (deleted)
             {
-                if (std::filesystem::remove_all(path->Path()))
-                {
-                    LOG("Folder deleted:", path->Path());
-                    m_removeFile = path;
-                }
-                else { LOG("Failed to delete folder:", path->Path()); }
+                LOG("Deleted:", path->Path());
+                m_removeFile = path;
             }
-            else
-            {
-                if (std::filesystem::remove(path->Path()))
-                {
-                    LOG("File deleted:", path->Path());
-                    m_removeFile = path;
-                }
-                else { LOG("Failed to delete file:", path->Path()); }
+            else 
+            { 
+                LOG("Failed to delete:", path->Path());
             }
-            
+
             ImGui::CloseCurrentPopup();
         }
+        
         ImGui::SameLine();
+
         if (ImGui::Button("NO", { 40, 30 }))
         {
-            LOG("Cancel delete file!");
             ImGui::CloseCurrentPopup();
         }
         ImGui::PopFont();
-        ImGui::PopStyleVar();
 
         ImGui::EndPopup();
     }
-
-    ImGui::PopStyleVar(2);
-    ImGui::PopStyleColor();
 }
 
-void DirectoryViewDock::OpenFolderContextMenu(const PTR<DirectoryNode>& path)
+void DirectoryViewDock::RenderContextMenu(const PTR<DirectoryNode>& path)
 {
     const ImVec2 buttonSize = { 150, 25 }; 
 
-    if(ImGui::Button("New File", buttonSize)) 
-    { 
+    if (path->m_isDirectory)
+    {
+        if(ImGui::Button("###New File", buttonSize)) 
+        { 
 
+        }
+        ImGui::SameLine(); ImGui::SetCursorPosX(20); ImGui::Text("New File");
+
+        if(ImGui::Button("###New Folder", buttonSize)) 
+        { 
+
+        }
+        ImGui::SameLine(); ImGui::SetCursorPosX(20); ImGui::Text("New Folder");
+
+        ImGui::Separator();
     }
-    if(ImGui::Button("New Folder...", buttonSize)) 
-    { 
 
-    }
-
-    ImGui::Separator();
-
-    if(ImGui::Button("Rename...", buttonSize)) 
+    if(ImGui::Button("###Rename", buttonSize)) 
     {
         ImGui::OpenPopup("Open Rename Modal"); 
     }
-    if(ImGui::Button("Delete Folder", buttonSize)) 
+    ImGui::SameLine(); ImGui::SetCursorPosX(20); ImGui::Text("Rename");
+
+    if(ImGui::Button("###Delete", buttonSize)) 
     {
         ImGui::OpenPopup("Open Delete Modal"); 
     }
+    ImGui::SameLine(); ImGui::SetCursorPosX(20); ImGui::Text("Delete");
 
     OpenDeleteModal(path);
     OpenRenameModal(path);

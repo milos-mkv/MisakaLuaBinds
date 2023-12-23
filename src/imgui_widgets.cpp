@@ -8732,7 +8732,6 @@ bool    ImGui::TabItemEx(ImGuiTabBar* tab_bar, const char* label, bool* p_open, 
 
     size.x = tab->Width;
 
-
     if (is_central_section)
         window->DC.CursorPos = tab_bar->BarRect.Min + ImVec2(IM_TRUNC(tab->Offset - tab_bar->ScrollingAnim), 0.0f);
     else
@@ -8894,11 +8893,11 @@ bool    ImGui::TabItemEx(ImGuiTabBar* tab_bar, const char* label, bool* p_open, 
     // MILI
     if (tab_contents_visible)
     {
-            const ImU32 col = ColorConvertFloat4ToU32({0.0641,0.0641,0.0641, 1.0f});// GetColorU32((flags & ImGuiTabBarFlags_IsFocused) ? ImGuiCol_TabActive : ImGuiCol_TabUnfocusedActive);
+        // const ImU32 col = ColorConvertFloat4ToU32({0.0641,0.0641,0.0641, 1.0f});// GetColorU32((flags & ImGuiTabBarFlags_IsFocused) ? ImGuiCol_TabActive : ImGuiCol_TabUnfocusedActive);
 
-        auto pos1 = ImVec2(pos.x + 1, pos.y + 30);
+        // auto pos1 = ImVec2(pos.x + 1, pos.y + 30);
 
-        window->DrawList->AddRectFilled(pos1, (pos1 + ImVec2(size.x-2, size.y + 2)), col);
+        // window->DrawList->AddRectFilled(pos1, (pos1 + ImVec2(size.x-2, size.y + 2)), col);
     }
 
     IM_ASSERT(!is_tab_button || !(tab_bar->SelectedTabId == tab->ID && is_tab_button)); // TabItemButton should not be selected

@@ -19,6 +19,8 @@
 
 #include <utils/Logger.hpp>
 
+#define ImGuiBeginMenuItem(name, shortcut, callback, ...) if (ImGui::MenuItem(name, shortcut)) { callback(__VA_ARGS__); }
+
 EngineMainMenuBar::EngineMainMenuBar()
 {
     LOG("EngineMainMenuBar::EngineMainMenuBar");
@@ -29,9 +31,19 @@ void EngineMainMenuBar::Destroy()
     LOG("EngineMainMenuBar::Destroy");
 }
 
+void EngineMainMenuBar::OpenCreateNewProjectPopup()
+{
+    openCreateNewProjectPopup = true;
+}
+
+void EngineMainMenuBar::Exit()
+{
+    glfwSetWindowShouldClose(glfwGetCurrentContext(), true);
+}
+
 void EngineMainMenuBar::Render()
 {
-    bool openCreateNewProjectPopup = false;
+    openCreateNewProjectPopup = false;
 
     if (ImGui::BeginMainMenuBar())
     {
@@ -45,76 +57,29 @@ void EngineMainMenuBar::Render()
 
         if (ImGui::BeginMenu("File"))
         {
-            if (ImGui::MenuItem(ICON_FA_GAMEPAD "  New Project", "Ctrl+P")) 
-            { 
-                openCreateNewProjectPopup = true;
-            }
+            ImGuiBeginMenuItem(ICON_FA_GAMEPAD "  New Project", "Ctrl+P", OpenCreateNewProjectPopup);
             ImGui::Separator();
-            if (ImGui::MenuItem("New File")) 
-            { 
-                NewFile();
-            }
-            if (ImGui::MenuItem("Open File")) 
-            { 
-                OpenFile();
-            }
-            if (ImGui::MenuItem("Open Folder")) 
-            { 
-                OpenFolder();
-            }
+            ImGuiBeginMenuItem("New File", NULL, NewFile);
+            ImGuiBeginMenuItem("Open File", NULL, OpenFile);
+            ImGuiBeginMenuItem("Open Folder", NULL, OpenFolder);
             ImGui::Separator();
-            if (ImGui::MenuItem("Save File")) 
-            { 
-                SaveFile();
-            }
-            if (ImGui::MenuItem("Save File As")) 
-            { 
-                SaveFileAs();
-            }
+            ImGuiBeginMenuItem("Save File", NULL, SaveFile);
+            ImGuiBeginMenuItem("Save File As", NULL, SaveFileAs);
             ImGui::Separator();
-            if (ImGui::MenuItem("Close File")) 
-            { 
-            }
-            if (ImGui::MenuItem("Close All Files")) 
-            { 
-            }
-            ImGui::Separator();
-            if (ImGui::MenuItem("Exit...", "Ctrl+Q")) 
-            {
-                glfwSetWindowShouldClose(glfwGetCurrentContext(), true);
-            }
+            ImGuiBeginMenuItem("Exit...", "Ctrl+Q", Exit);
             ImGui::EndMenu();
         }
         
         if (ImGui::BeginMenu("Edit"))
         {
-            if (ImGui::MenuItem(ICON_FA_ROTATE_LEFT "   Undo", "Ctrl+Z")) 
-            { 
-                LOG("Perform menu action - Edit - Undo");
-            }
-            if (ImGui::MenuItem(ICON_FA_ROTATE_RIGHT "   Redo", "Ctrl+Y")) 
-            { 
-                LOG("Perform menu action - Edit - Redo");
-            }
+            ImGuiBeginMenuItem(ICON_FA_ROTATE_LEFT  "   Undo", "Ctrl+Z", UndoAction);
+            ImGuiBeginMenuItem(ICON_FA_ROTATE_RIGHT "   Redo", "Ctrl+Y", RedoAction);
             ImGui::Separator();
-            if (ImGui::MenuItem(ICON_FA_SCISSORS "   Cut", "Ctrl+X")) 
-            {
-                LOG("Perform menu action - Edit - Cut");
-            }
-            if (ImGui::MenuItem(ICON_FA_COPY "   Copy", "Ctrl+C")) 
-            {
-                LOG("Perform menu action - Edit - Copy");
-
-            }
-            if (ImGui::MenuItem(ICON_FA_PASTE "   Paste", "Ctrl+V")) 
-            { 
-                LOG("Perform menu action - Edit - Paste");
-            }
+            ImGuiBeginMenuItem(ICON_FA_SCISSORS "   Cut", "Ctrl+X", CutAction);
+            ImGuiBeginMenuItem(ICON_FA_COPY "   Copy", "Ctrl+C", CopyAction);
+            ImGuiBeginMenuItem(ICON_FA_PASTE "   Paste", "Ctrl+V", PasteAction);
             ImGui::Separator();
-            if (ImGui::MenuItem(ICON_FA_MAGNIFYING_GLASS "   Find", "Ctrl+F")) 
-            { 
-                LOG("Perform menu action - Edit - Find");
-            }
+            ImGuiBeginMenuItem(ICON_FA_MAGNIFYING_GLASS "   Find", "Ctrl+F", FindAction);
             ImGui::EndMenu();
         }
 
@@ -150,9 +115,9 @@ void EngineMainMenuBar::Render()
         ImGui::PopStyleColor(2);
         ImGui::PopStyleVar(4);
 
-        cur.x = ImGui::GetWindowSize().x - 100;
-        ImGui::SetCursorPos(cur);
+        ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 40);
         ImGui::Text(std::to_string((int)ImGui::GetIO().Framerate).c_str());
+        
         ImGui::EndMainMenuBar();
     }
 
@@ -163,6 +128,32 @@ void EngineMainMenuBar::Render()
     CreateNewProjectPopup();
 }
 
+void EngineMainMenuBar::UndoAction()
+{
+    LOG("EngineMainMenuBar::UndoAction");
+    const auto& docks = EngineUI::Get()->GetDock<OpenedFilesDock>();
+    docks->m_files[docks->m_selected]->m_editor->Undo();
+}
+void EngineMainMenuBar::RedoAction()
+{
+    
+}
+void EngineMainMenuBar::CopyAction()
+{
+    
+}
+void EngineMainMenuBar::PasteAction()
+{
+    
+}
+void EngineMainMenuBar::CutAction()
+{
+    
+}
+void EngineMainMenuBar::FindAction()
+{
+    
+}
 void EngineMainMenuBar::OpenFile()
 {
     LOG("EngineMainMenuBar::OpenFile");

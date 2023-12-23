@@ -2,7 +2,6 @@
 #include <engine/ui/EngineAssetManager.hpp>
 
 #include <engine/ui/docks/DirectoryViewDock.hpp>
-#include <engine/ui/docks/CodeEditorDock.hpp>
 #include <engine/ui/docks/OpenedFilesDock.hpp>
 #include <engine/ui/docks/StatusBarDock.hpp>
 #include <engine/ui/docks/OutputDock.hpp>
@@ -23,12 +22,12 @@ EngineUI::EngineUI()
     LOG("EngineUI::EngineUI");
 
     m_assetManager = EngineAssetManager::Get();
-
+    
     m_uiDocks[typeid(EngineMainMenuBar)] = CreatePTR(EngineMainMenuBar);
     m_uiDocks[typeid(DirectoryViewDock)] = CreatePTR(DirectoryViewDock);
-    m_uiDocks[typeid(OpenedFilesDock)]   = CreatePTR(OpenedFilesDock);
-    m_uiDocks[typeid(StatusBarDock)]     = CreatePTR(StatusBarDock);
-    m_uiDocks[typeid(OutputDock)]        = CreatePTR(OutputDock);
+    m_uiDocks[typeid(OpenedFilesDock)] = CreatePTR(OpenedFilesDock);
+    // m_uiDocks[typeid(StatusBarDock)] = CreatePTR(StatusBarDock);
+    // m_uiDocks[typeid(OutputDock)] = CreatePTR(OutputDock);
 }
 
 

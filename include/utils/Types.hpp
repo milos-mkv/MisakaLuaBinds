@@ -10,4 +10,7 @@
 #define COLOR_BORDER_4   { 0.3000, 0.3000, 0.3000, 1.00 }
 #define COLOR_CHILD_BG_4 { 0.0641, 0.0641, 0.0641, 1.00 }
 #define COLOR_BG_4       { 0.0941, 0.0941, 0.0941, 1.00 }
+
+#define BACKGROUND_COLOR { 0.0641F, 0.0641F, 0.0641F, 1.0000F }
+
 #endif

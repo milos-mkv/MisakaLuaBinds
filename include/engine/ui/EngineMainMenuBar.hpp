@@ -7,6 +7,8 @@
 class EngineMainMenuBar : public EngineUIDock
 {
 public:
+    bool openCreateNewProjectPopup = false;
+
     void Render() override;
     void Destroy() override;
 
@@ -18,6 +20,14 @@ public:
     void OpenFolder();
     void SaveFile();
     void SaveFileAs();
+    void Exit();
+    void UndoAction();
+    void FindAction();
+    void RedoAction();
+    void CopyAction();
+    void CutAction();
+    void PasteAction();
+    void OpenCreateNewProjectPopup();
 
     void CreateNewProjectPopup();
 

@@ -6,7 +6,6 @@
 #include "EngineUIDock.hpp"
 #include <imgui.h>
 #include <typeindex>
-#include <engine/ui/docks/CodeEditorDock.hpp>
 #include <engine/ui/EngineAssetManager.hpp>
 
 #include <utils/Types.hpp>
