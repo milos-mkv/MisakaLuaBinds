@@ -14,7 +14,7 @@ EngineAssetManager::EngineAssetManager()
 {
     m_textures["File Icon"]   = Texture::CreateTexture("file.png");
     m_textures["Folder Icon"] = Texture::CreateTexture("folder.png");
-    m_textures["Project"]     = Texture::CreateTexture("project.jpg");
+    m_textures["Project"]     = Texture::CreateTexture("project.png");
 
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImFontConfig config;

@@ -186,7 +186,8 @@ void OpenedFilesDock::OpenEmptyFile()
 
 OpenedFilesDock::OpenedFilesDock()
     : m_selected(""), 
-      m_files(std::unordered_map<std::string, PTR<CodeEditorWidget>>())
+      m_files(std::unordered_map<std::string, PTR<CodeEditorWidget>>()),
+      m_tabsToRemove(std::stack<std::string>())
 {
     LOG("OpenedFilesDock::OpenedFilesDock");
 

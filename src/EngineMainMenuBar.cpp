@@ -19,12 +19,35 @@
 
 #include <utils/Logger.hpp>
 
+// Safe way to access current active code editor and perform an action on it.
+#define EngineEditorDoAction(action, errMsg)                                    \
+    auto& selected = EngineUI::Get()->GetDock<OpenedFilesDock>()->m_selected;   \
+    auto& files    = EngineUI::Get()->GetDock<OpenedFilesDock>()->m_files;      \
+    if (files.find(selected) != files.end()) { files[selected]->m_editor->action(); } else { LOG(errMsg); }
+
+// Safe way to access current active code editor widget and perform action on it.
+#define EngineEditorWidgetDoAction(action, errMsg)                              \
+    auto& selected = EngineUI::Get()->GetDock<OpenedFilesDock>()->m_selected;   \
+    auto& files    = EngineUI::Get()->GetDock<OpenedFilesDock>()->m_files;      \
+    if (files.find(selected) != files.end()) { files[selected]->action(); } else { LOG(errMsg); }
+
+// Abort action if path is invalid. (empty)
+#define AbortIfPathIsInvalid(path) if (path.empty()) { LOG("Provided path is invalid!"); return; }
+
+// Short version of creating menu item.
 #define ImGuiBeginMenuItem(name, shortcut, callback, ...) if (ImGui::MenuItem(name, shortcut)) { callback(__VA_ARGS__); }
 
-EngineMainMenuBar::EngineMainMenuBar()
+// Render text with provided font.
+#define ImGuiTextWithFont(text, font) ImGui::PushFont(EngineAssetManager::Get()->m_fonts[font]); \
+                                      ImGui::Text(text); \
+                                      ImGui::PopFont();
+
+EngineMainMenuBar::EngineMainMenuBar() 
+    : m_openCreateNewProjectPopup(false)
+    , m_createProjectModalFlags(ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoTitleBar)
 {
     LOG("EngineMainMenuBar::EngineMainMenuBar");
-}
+}   
 
 void EngineMainMenuBar::Destroy()
 {
@@ -33,289 +56,215 @@ void EngineMainMenuBar::Destroy()
 
 void EngineMainMenuBar::OpenCreateNewProjectPopup()
 {
-    openCreateNewProjectPopup = true;
+    m_openCreateNewProjectPopup = true;
 }
 
-void EngineMainMenuBar::Exit()
+void EngineMainMenuBar::MenuActionExit()
 {
     glfwSetWindowShouldClose(glfwGetCurrentContext(), true);
 }
 
+void EngineMainMenuBar::MenuActionToggleDirectoryView()
+{
+    LOG("Perform menu action - View - Toggle Directory View");
+    auto dirView = EngineUI::Get()->GetDock<DirectoryViewDock>();
+    dirView->m_visible = !(dirView->m_visible);
+}
+
+void EngineMainMenuBar::MenuActionAbout()
+{
+    LOG("Perform menu action - Help - About");
+}
+
 void EngineMainMenuBar::Render()
 {
-    openCreateNewProjectPopup = false;
+    m_openCreateNewProjectPopup = false;
 
     if (ImGui::BeginMainMenuBar())
     {
-        auto cur =ImGui::GetCursorPos();
-        ImGui::PushStyleColor(ImGuiCol_Border, { 0.3, 0.3, 0.3, 1 });
-        ImGui::PushStyleColor(ImGuiCol_Text, { 0.8, 0.8, 0.8, 1.0});
-        ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 5);
-        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 15);
-        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 15);
+        ImGui::PushStyleColor(ImGuiCol_Border, { 0.3F, 0.3F, 0.3F, 1.0F });
+        ImGui::PushStyleColor(ImGuiCol_Text, { 0.8F, 0.8F, 0.8F, 1.0F });
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 15, 5 });
+        ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 5);
 
         if (ImGui::BeginMenu("File"))
         {
             ImGuiBeginMenuItem(ICON_FA_GAMEPAD "  New Project", "Ctrl+P", OpenCreateNewProjectPopup);
             ImGui::Separator();
-            ImGuiBeginMenuItem("New File", NULL, NewFile);
-            ImGuiBeginMenuItem("Open File", NULL, OpenFile);
-            ImGuiBeginMenuItem("Open Folder", NULL, OpenFolder);
+            ImGuiBeginMenuItem("New File", NULL, MenuActionNewFile);
+            ImGuiBeginMenuItem("Open File", NULL, MenuActionOpenFile);
+            ImGuiBeginMenuItem("Open Folder", NULL, MenuActionOpenFolder);
             ImGui::Separator();
-            ImGuiBeginMenuItem("Save File", NULL, SaveFile);
-            ImGuiBeginMenuItem("Save File As", NULL, SaveFileAs);
+            ImGuiBeginMenuItem("Save File", NULL, MenuActionSaveFile);
+            ImGuiBeginMenuItem("Save File As", NULL, MenuActionSaveFileAs);
             ImGui::Separator();
-            ImGuiBeginMenuItem("Exit...", "Ctrl+Q", Exit);
+            ImGuiBeginMenuItem("Exit...", "Ctrl+Q", MenuActionExit);
             ImGui::EndMenu();
         }
         
         if (ImGui::BeginMenu("Edit"))
         {
-            ImGuiBeginMenuItem(ICON_FA_ROTATE_LEFT  "   Undo", "Ctrl+Z", UndoAction);
-            ImGuiBeginMenuItem(ICON_FA_ROTATE_RIGHT "   Redo", "Ctrl+Y", RedoAction);
+            ImGuiBeginMenuItem(ICON_FA_ROTATE_LEFT  "   Undo", "Ctrl+Z", MenuActionUndoAction);
+            ImGuiBeginMenuItem(ICON_FA_ROTATE_RIGHT "   Redo", "Ctrl+Y", MenuActionRedoAction);
             ImGui::Separator();
-            ImGuiBeginMenuItem(ICON_FA_SCISSORS "   Cut", "Ctrl+X", CutAction);
-            ImGuiBeginMenuItem(ICON_FA_COPY "   Copy", "Ctrl+C", CopyAction);
-            ImGuiBeginMenuItem(ICON_FA_PASTE "   Paste", "Ctrl+V", PasteAction);
+            ImGuiBeginMenuItem(ICON_FA_SCISSORS "   Cut", "Ctrl+X", MenuActionCutAction);
+            ImGuiBeginMenuItem(ICON_FA_COPY "   Copy", "Ctrl+C", MenuActionCopyAction);
+            ImGuiBeginMenuItem(ICON_FA_PASTE "   Paste", "Ctrl+V", MenuActionPasteAction);
             ImGui::Separator();
-            ImGuiBeginMenuItem(ICON_FA_MAGNIFYING_GLASS "   Find", "Ctrl+F", FindAction);
+            ImGuiBeginMenuItem(ICON_FA_MAGNIFYING_GLASS "   Find", "Ctrl+F", MenuActionFindAction);
             ImGui::EndMenu();
         }
 
         if (ImGui::BeginMenu("View"))
         {
-            if (ImGui::MenuItem("Toggle Directory View")) 
-            { 
-                LOG("Perform menu action - View - Toggle Directory View");
-                auto dirView = EngineUI::Get()->GetDock<DirectoryViewDock>();
-                dirView->m_visible = !(dirView->m_visible);
-            }
-            if (ImGui::MenuItem("Toggle Toolbar")) 
-            { 
-                LOG("Perform menu action - View - Toggle Toolbar");
-            }
-            if (ImGui::MenuItem("Toggle Output Dock")) 
-            { 
-                LOG("Perform menu action - View - Toggle Output Dock");
-            }
+            ImGuiBeginMenuItem("Toggle Directory View", NULL, MenuActionToggleDirectoryView);
             ImGui::EndMenu();
         }
 
-         if (ImGui::BeginMenu("Help"))
+        if (ImGui::BeginMenu("Help"))
         {
-            if (ImGui::MenuItem("About")) 
-            { 
-                LOG("Perform menu action - Help - About");
-     
-            }
-          
+            ImGuiBeginMenuItem("About", NULL, MenuActionAbout);
             ImGui::EndMenu();
         }
+
         ImGui::PopStyleColor(2);
-        ImGui::PopStyleVar(4);
+        ImGui::PopStyleVar(2);
 
         ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 40);
-        ImGui::Text(std::to_string((int)ImGui::GetIO().Framerate).c_str());
-        
+        ImGuiTextWithFont(std::to_string((int)ImGui::GetIO().Framerate).c_str(), "JetBrains");
         ImGui::EndMainMenuBar();
     }
 
-    if (openCreateNewProjectPopup)               
+    if (m_openCreateNewProjectPopup)               
     {    
-        ImGui::OpenPopup("CREATE NEW PROJECT");
+        ImGui::OpenPopup("Create New Project Modal");
     }
     CreateNewProjectPopup();
 }
 
-void EngineMainMenuBar::UndoAction()
-{
-    LOG("EngineMainMenuBar::UndoAction");
-    const auto& docks = EngineUI::Get()->GetDock<OpenedFilesDock>();
-    docks->m_files[docks->m_selected]->m_editor->Undo();
-}
-void EngineMainMenuBar::RedoAction()
-{
-    
-}
-void EngineMainMenuBar::CopyAction()
-{
-    
-}
-void EngineMainMenuBar::PasteAction()
-{
-    
-}
-void EngineMainMenuBar::CutAction()
-{
-    
-}
-void EngineMainMenuBar::FindAction()
-{
-    
-}
-void EngineMainMenuBar::OpenFile()
-{
-    LOG("EngineMainMenuBar::OpenFile");
-    std::string path = EngineOpenFileDialog();
 
-    if (!path.empty())
-    {
-        EngineUI::Get()->GetDock<OpenedFilesDock>()->OpenFile(File(path));
-    }
+void EngineMainMenuBar::MenuActionUndoAction()
+{
+    LOG("EngineMainMenuBar -> MenuActionUndoAction");
+    EngineEditorDoAction(Undo, "Unable to perform Undo action!");
+}
+void EngineMainMenuBar::MenuActionRedoAction()
+{
+    LOG("EngineMainMenuBar -> MenuActionRedoAction");
+    EngineEditorDoAction(Redo, "Unable to perform Redo action!");
 }
 
-void EngineMainMenuBar::NewFile()
+void EngineMainMenuBar::MenuActionCopyAction()
 {
-    LOG("EngineMainMenuBar::NewFile");
- 
+    LOG("EngineMainMenuBar -> MenuActionCopyAction");
+    EngineEditorDoAction(Copy, "Unable to perform Copy action!");
+}
+
+void EngineMainMenuBar::MenuActionPasteAction()
+{
+    LOG("EngineMainMenuBar -> MenuActionPasteAction");
+    EngineEditorDoAction(Paste, "Unable to perform Paste action!");
+}
+
+void EngineMainMenuBar::MenuActionCutAction()
+{
+    LOG("EngineMainMenuBar -> MenuActionCutAction");
+    EngineEditorDoAction(Cut, "Unable to perform Cut action!");
+}
+
+void EngineMainMenuBar::MenuActionFindAction()
+{
+    LOG("EngineMainMenuBar -> MenuActionFindAction");
+}
+
+void EngineMainMenuBar::MenuActionNewFile()
+{
+    LOG("EngineMainMenuBar -> MenuActionNewFile");
     EngineUI::Get()->GetDock<OpenedFilesDock>()->OpenEmptyFile();
-    
 }
 
-void EngineMainMenuBar::SaveFile()
+void EngineMainMenuBar::MenuActionOpenFile()
 {
-    LOG("EngineMainMenuBar::SaveFile");
-
-    auto openedFilesDock = EngineUI::Get()->GetDock<OpenedFilesDock>();
-
-    if (openedFilesDock->m_files.size() == 0)
-        return;
-
-    if (openedFilesDock->m_selected.empty())
-        return;
-
-    openedFilesDock->m_files[openedFilesDock->m_selected]->Save();
+    LOG("EngineMainMenuBar -> MenuActionOpenFile");
+    std::string path = EngineOpenFileDialog();
+    AbortIfPathIsInvalid(path);
+    EngineUI::Get()->GetDock<OpenedFilesDock>()->OpenFile(File(path));
 }
 
-void EngineMainMenuBar::SaveFileAs()
+void EngineMainMenuBar::MenuActionSaveFile()
 {
-    LOG("EngineMainMenuBar::SaveFile");
-
-    auto openedFilesDock = EngineUI::Get()->GetDock<OpenedFilesDock>();
-
-    if (openedFilesDock->m_files.size() == 0)
-        return;
-
-    if (openedFilesDock->m_selected.empty())
-        return;
-
-    openedFilesDock->m_files[openedFilesDock->m_selected]->SaveAs();
+    LOG("EngineMainMenuBar -> MenuActionSaveFile");
+    EngineEditorWidgetDoAction(Save, "Failed to perform Save action.");
 }
 
-void EngineMainMenuBar::OpenFolder()
+void EngineMainMenuBar::MenuActionSaveFileAs()
+{
+    LOG("EngineMainMenuBar -> MenuActionSaveFileAs");
+    EngineEditorWidgetDoAction(SaveAs, "Failed to perform SaveAs action.");
+}
+
+void EngineMainMenuBar::MenuActionOpenFolder()
 {
     LOG("EngineMainMenuBar::OpenFolder");
     std::string path = EngineOpenFolderDialog();
-
-    if (!path.empty())
-    {
-        EngineUI::Get()->GetDock<DirectoryViewDock>()->OpenFolder(path.c_str());
-    }
+    AbortIfPathIsInvalid(path)
+    EngineUI::Get()->GetDock<DirectoryViewDock>()->OpenFolder(path);
 }
-
-static std::string GetOpenFolderPath()
-{
-    nfdchar_t *outPath = NULL;
-    nfdresult_t result = NFD_PickFolder(NULL, &outPath);
-        
-    if (result == NFD_OKAY) 
-    {
-        LOG("Opening folder:", outPath);
-        return std::string(outPath);
-    }
-    else if (result == NFD_CANCEL) 
-    {
-        LOG("Open folder dialog canceled");
-        return "";
-    }
-    else 
-    {
-        LOG(NFD_GetError());
-        return "";
-    }
-}
-
 
 void EngineMainMenuBar::CreateNewProjectPopup()
 {
+    auto workSize   = ImGui::GetMainViewport()->WorkSize;
+    auto modalSize  = ImVec2(500, 180);
     bool unsuedOpen = true;
-    ImGui::SetNextWindowPos({
-        ImGui::GetMainViewport()->WorkSize.x / 2 - 500 / 2,
-        ImGui::GetMainViewport()->WorkSize.y / 2 - 300 / 2
-    });
-    ImGui::SetNextWindowSize({ 500, 300 });
-    ImGui::PushFont(EngineAssetManager::Get()->m_fonts["JetBrains"]);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10);
-    ImGui::PushStyleColor(ImGuiCol_Border, { 0.51, 0.51, 0.51, 1});
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
 
-    auto flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoTitleBar;
+    ImGui::SetNextWindowPos({ workSize.x / 2 - modalSize.x / 2, workSize.y / 2 - modalSize.y / 2 });
+    ImGui::SetNextWindowSize(modalSize);
 
-    if(ImGui::BeginPopupModal("CREATE NEW PROJECT", &unsuedOpen, flags))
+    ImGui::PushStyleColor(ImGuiCol_Border, { 0.3F, 0.3F, 0.3F, 1.0F });
+    ImGui::PushStyleColor(ImGuiCol_PopupBg, { 0.05F, 0.05F, 0.05F, 1.0F });
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 10, 5 });
+
+    if(ImGui::BeginPopupModal("Create New Project Modal", &unsuedOpen, m_createProjectModalFlags))
     {
-        auto cursave = ImGui::GetCursorPos();
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5);
 
-        ImGui::SetCursorPos({-5, 0});
-        ImGui::Image((ImTextureID) EngineAssetManager::Get()->m_textures["Project"].id, { 300, 300}, { 0, 0}, {1, 1}, {1, 1, 1, 0.5f});
-        ImGui::SetCursorPos(cursave);
+        ImGui::PushFont(EngineAssetManager::Get()->m_fonts["JetBrains"]);
+        ImGui::Text("CRETE NEW PROJECT");
+        ImGui::PopFont();
+        
+        ImGuiTextWithFont("Project Name", "JetBrains");
 
-        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10);
-        ImGui::SetCursorPosX(260);
-        ImGui::Text("PROJECT NAME");
-
-        ImGui::SetNextItemWidth(-15);
-        ImGui::SetCursorPosX(260);
-
+        ImGui::SetNextItemWidth(-1);
         static char sProjectName[30];
         ImGui::InputText("##InputProjName", sProjectName, 30);
 
-        ImGui::SetCursorPosX(260);
-        ImGui::Text("LOCATION");
-
-        ImGui::SetCursorPosX(260);
-        ImGui::SetNextItemWidth(-50);
+        ImGuiTextWithFont("Location", "JetBrains");
+        ImGui::SetNextItemWidth(-45);
 
         static char sProjectPath[255];
+
         ImGui::BeginDisabled();
         ImGui::InputText("##InputProjName1", sProjectPath, 255);
         ImGui::EndDisabled();
+
         ImGui::SameLine();        
         auto newpos = ImGui::GetCursorPos();
-        if(ImGui::Button("  "))
+        ImGui::PushStyleColor(ImGuiCol_Button, { 0, 0, 0, 0 });
+        if(ImGui::Button("      "))
         {
-            std::string path = GetOpenFolderPath();
+            std::string path = EngineOpenFolderDialog();
             strcpy(sProjectPath, path.c_str());
-        }
-        ImGui::SameLine();
-        ImGui::SetCursorPos(newpos);
-        ImGui::Image((ImTextureID) EngineAssetManager::Get()->m_textures["Folder Icon"].id, { 26, 26});
-
-        ImGui::SetCursorPosX(260);
-        ImGui::Text("PROJECT TYPE");
-
-        const char* items[] = { "LUA", "C++" };
-        static const char* current_item = items[0];
-        
-        ImGui::SetCursorPosX(260);
-        ImGui::SetNextItemWidth(-15);
-        if (ImGui::BeginCombo("##combo", current_item)) // The second parameter is the label previewed before opening the combo.
-        {
-            for (int n = 0; n < IM_ARRAYSIZE(items); n++)
-            {
-                bool is_selected = (current_item == items[n]); // You can store your selection however you want, outside or inside your objects
-                if (ImGui::Selectable(items[n], is_selected))
-                    current_item = items[n];
-                if (is_selected)
-                    ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
-            }
-            ImGui::EndCombo();
-        }
+        }     
+        ImGui::PopStyleColor();
+        ImGui::SetCursorPos({ newpos.x + 7, newpos.y + 5 });
+        ImGui::Text(ICON_FA_FOLDER);
 
         ImGui::SetCursorPos({ImGui::GetWindowSize().x - 75, ImGui::GetWindowSize().y - 35});
+        ImGui::PushFont(EngineAssetManager::Get()->m_fonts["JetBrains"]);
         if(ImGui::Button("CREATE"))
         {
-            OnCreateNewProjectConfirm(sProjectName, sProjectPath, current_item ? current_item : "");
+            OnCreateNewProjectConfirm(sProjectName, sProjectPath);
             ImGui::CloseCurrentPopup();
         }
         ImGui::SameLine();
@@ -324,17 +273,17 @@ void EngineMainMenuBar::CreateNewProjectPopup()
         {
             ImGui::CloseCurrentPopup();
         }
-   
+        ImGui::PopFont();
+        ImGui::PopStyleVar();
         ImGui::EndPopup();
     }
-    ImGui::PopStyleColor();
-    ImGui::PopStyleVar(2);
-    ImGui::PopFont();
+    ImGui::PopStyleColor(2);
+    ImGui::PopStyleVar();
 }
 
-void EngineMainMenuBar::OnCreateNewProjectConfirm(const std::string& name, const std::string& path, const std::string& type)
+void EngineMainMenuBar::OnCreateNewProjectConfirm(const std::string& name, const std::string& path)
 {
-    LOG("EngineMainMenuBar::OnCreateNewProjectConfirm:", name, path, type);
+    LOG("EngineMainMenuBar::OnCreateNewProjectConfirm:", name, path);
 
     std::filesystem::path p(path);
     if (!std::filesystem::exists(p))
@@ -346,7 +295,8 @@ void EngineMainMenuBar::OnCreateNewProjectConfirm(const std::string& name, const
     std::filesystem::current_path(p);
     std::filesystem::create_directory(name.c_str());
     std::ofstream ofs(path + "/" + name + "/main.lua");
-    ofs << "print(\"Hello world\")"; 
+    ofs << "--- Remilia Scarlet Project : " << name << "\n"; 
+    ofs << "print(\"Entry point.\")"; 
     ofs.close();
 
     ofs = std::ofstream(path + "/" + name + "/project.json");
